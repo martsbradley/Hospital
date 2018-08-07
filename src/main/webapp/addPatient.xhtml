@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+        <title>Add Patient</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+    </h:head>
+    <h:body style="padding:5%">
+    <h1>Add Patient</h1>
+    <div class="border">
+        <h:form style="padding:5%">
+            <div class="form-group row">
+                <h:outputLabel for="forename" class="col-sm-2 col-form-label">Forename:</h:outputLabel>
+                <div class="col-sm-6">
+                    <h:inputText id="forename" 
+                                 class="form-control"
+                                 title="Forename"
+                                 value="#{patientBean.forename}"
+                                 required="true"
+                                 requiredMessage="Error: A forename is required"
+                                 maxlength="25" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <h:outputLabel for="surname" class="col-sm-2 col-form-label">Surname:</h:outputLabel>
+                <div class="col-sm-6">
+                    <h:inputText id="surname" 
+                                 class="form-control"
+                                 title="Surname"
+                                 value="#{patientBean.surname}"
+                                 required="true"
+                                 requiredMessage="Error: A surname is required"
+                                 maxlength="25" />
+                </div>
+            </div>
+            <div class="form-group">
+                <h:commandButton id="submit" value="Add"    action="#{patientHandler.addPatient(patientBean)}"/>
+                <h:commandButton id="cancel" value="Cancel" action="greeting"  immediate="true" />
+            </div>
+        </h:form>
+    </div>
+    </h:body>
+</html>

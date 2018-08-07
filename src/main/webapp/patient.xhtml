@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough" 
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+    xmlns:e="http://xmlns.jcp.org/jsf/composite/emcomp"
+    xmlns:f="http://java.sun.com/jsf/core" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+    <style> .error { color: red;} </style>
+</h:head>
+<h:body>
+    <f:view>
+    <ui:remove>
+        <f:metadata>
+            <f:viewParam name="id" value="#{patientCtrl.id}" />
+            <f:viewAction action="#{patientCtrl.load}" onPostBack="false" />
+        </f:metadata>
+    </ui:remove>
+        <h:form id="form">
+            <div class="form-group">
+                <h:outputLabel id="messages" value="" binding="#{patientCtrl.reportErrors}"/>
+                <h:message for="messages" class="error" />
+                <h2>Patient Information</h2>
+                <e:patient title="" patient="#{patientCtrl.patientBean}" />
+
+                <hr/>
+
+                <h2>Prescriptions</h2>
+                <p:dataTable id="prescriptionTable" value="#{patientCtrl.patientBean.prescription}"
+                             var="prescription" paginator="false" rowKey="#{prescription.id}" >
+                   <p:column sortBy="#{prescription.id}">
+                        <f:facet name="header">Id</f:facet>
+                            <h:commandLink action="#{prescriptionCtrl.startEdit(prescription)}" >
+                                    <h:outputText value="#{prescription.id}" />
+                            </h:commandLink>
+                   </p:column>
+                   <p:column sortBy="#{prescription.startDate}">
+                        <f:facet name="header">Starting</f:facet>
+                            <h:outputText value="#{prescription.startDate}" />
+                   </p:column>
+                   <p:column sortBy="#{prescription.endDate}">
+                        <f:facet name="header">Ending</f:facet>
+                            <h:outputText value="#{prescription.endDate}" />
+                   </p:column>
+                   <p:column sortBy="#{prescription.amount}">
+                        <f:facet name="header">Quantity</f:facet>
+                            <h:outputText value="#{prescription.amount}" />
+                   </p:column>
+                   <p:column sortBy="#{prescription.medicine}">
+                        <f:facet name="header">Medicine</f:facet>
+                            <h:outputText value="#{prescription.medicine.name}" />
+                   </p:column>
+                </p:dataTable>
+
+                <hr/>
+                <h:commandButton id="submitSave" value="Save"
+                                action="${patientCtrl.saveSelectedPatient()}" />
+                <h:commandButton id="cancelAdd" value="Cancel" 
+                                action="patients" immediate="true" />
+
+                <h:commandButton id="tabs" value="Add Tablets" action="#{patientCtrl.startFlow()}" />
+            </div>
+        </h:form>
+    </f:view>
+</h:body>
+</html>

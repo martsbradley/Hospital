@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough" 
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+    xmlns:e="http://xmlns.jcp.org/jsf/composite/emcomp"
+    xmlns:f="http://java.sun.com/jsf/core" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+        <title>Firstcup Greeting Page</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+    </h:head>
+    <h:body style="padding:5%">
+    <div class="border">
+        <h:form style="padding:5%">
+            <div class="form-group">
+                <ol>
+                    <li><h:commandButton value="Patients"    action="patients"/></li>
+                    <li><h:commandButton value="Medicine"    action="meds" /></li>
+                    <li><h:commandButton value="Enter Flow"  action="simple-flow" /></li>
+                    <li><h:commandButton value="Checkout"    action="checkoutFlow" /></li>
+                    <li><h:commandButton value="join"        action="joinFlow"/></li>
+                    <li><h:commandButton value="Add Tablets" action="prescriptionFlow"/></li>
+                </ol>
+            </div>
+        </h:form>
+    </div>
+    </h:body>
+</html>

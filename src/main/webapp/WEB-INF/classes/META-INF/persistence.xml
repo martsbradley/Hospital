@@ -1,0 +1,6 @@
+<persistence>
+    <persistence-unit name="OrderManagement">
+	<jta-data-source>java:/MartyPostgres</jta-data-source>
+	<class>martinbradley.hospital.persistence.repository.PatientDBRepo</class>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough" 
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+    xmlns:e="http://xmlns.jcp.org/jsf/composite/emcomp"
+    xmlns:f="http://java.sun.com/jsf/core" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <h:outputStylesheet library="css" name="stylesheet.css"/>
+    <title>Checkout Module: Entry Page (Order)</title>
+</h:head>
+<h:body>
+        <h:form prependId="false">
+            <h:graphicImage url="#{resource['images:duke.books.gif']}" 
+                            alt="Duke carrying books"/>
+            <h2>Order Page</h2>
+            <p>You have ordered #{checkoutBean.numItems}
+                books at a cost of 
+                <h:outputText value="#{checkoutBean.cost}">
+                    <f:convertNumber currencySymbol="$" type="currency"/>
+                </h:outputText>.</p>
+            <p>Click Check Out to check out your order and enter the checkout
+                flow.</p>
+            <p><h:commandButton value="Check Out" action="checkoutFlow"/></p>
+            <p>Click Join to join our mailing list or club and enter the join
+                flow.</p>
+            <p><h:commandButton value="Join" action="joinFlow"/></p>
+            <p>This page is the exit point for the checkout flow pages.</p>
+        </h:form>
+    </h:body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough" 
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+    xmlns:e="http://xmlns.jcp.org/jsf/composite/emcomp"
+    xmlns:f="http://java.sun.com/jsf/core" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+        <style>
+            .error { color: red;}
+        </style>
+</h:head>
+<h:body>
+    <h:form id="form">
+    <h1>Prescription Cancelled</h1>
+        <f:view>
+            
+            This prescription has been cancelled.
+            <hr/>
+
+            Press continue to continue... TODO
+            <h:link id="cancel" value="Continue" outcome="/patient" immediate="true" >
+               <f:param name="id" value="#{flash.ThepatientId}"/>
+            </h:link>
+        </f:view>
+    </h:form>
+</h:body>
+</html>
