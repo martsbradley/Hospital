@@ -16,6 +16,10 @@
         <param-name>javax.faces.CLIENT_WINDOW_MODE</param-name>
         <param-value>url</param-value>
     </context-param>
+    <context-param>
+        <param-name>javax.faces.validator.ENABLE_VALIDATE_WHOLE_BEAN</param-name>
+            <param-value>true</param-value>
+    </context-param>
 
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>

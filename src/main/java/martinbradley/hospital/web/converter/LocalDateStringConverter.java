@@ -27,7 +27,7 @@ public class LocalDateStringConverter implements Converter
     
     private DateTimeFormatter getFormatter()
     {
-        return DateTimeFormatter.ofPattern("E MMM yyyy");
+        return DateTimeFormatter.ofPattern("E d MMM yyyy");
     }
 
     @Override

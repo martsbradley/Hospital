@@ -28,27 +28,39 @@ import martinbradley.hospital.core.api.dto.Message;
 import martinbradley.hospital.core.api.dto.MessageCollection;
 import martinbradley.jsf.util.JSFUtil;
 import java.time.LocalDate;
-/**
- * Backing bean for CheckoutFlow.
- */
+import martinbradley.hospital.web.DateRangeValid;
+import martinbradley.hospital.web.LocalDateRange;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 @Named
 @FlowScoped("prescriptionFlow")
-public class PrescriptionFlowBean implements Serializable 
+@DateRangeValid
+public class PrescriptionFlowBean implements Serializable, LocalDateRange
 {
-    private JSFUtil jsfUtil = new JSFUtil();
+    //private JSFUtil jsfUtil = new JSFUtil();
     private static final Logger logger = LoggerFactory.getLogger(PrescriptionFlowBean.class);
     private static final long serialVersionUID = 1L;
+    @Inject MedicineHandler medHandler;
 
     private Long patientId;
     @NotNull private MedicineBean selectedMedicine;
-
-    private LocalDate startDate = LocalDate.now();
-    private LocalDate endDate = LocalDate.now();
+    private LocalDate startDate;//= LocalDate.now();
+    private LocalDate endDate  ;//= LocalDate.now();
 
     private String name = "";
     private String medicineSearch;
-    @Inject MedicineHandler medHandler;
     private MedicineLazyList medLazyList = new MedicineLazyList();
+
+    @PostConstruct
+    public void setHandler()
+    {
+        logger.debug("PostConstruct called setting " + medHandler);
+        medLazyList.setHandler(medHandler);
+    }
 
     public void setSelectedMedicine(MedicineBean selectedMedicine)
     {
@@ -61,6 +73,59 @@ public class PrescriptionFlowBean implements Serializable
             this.selectedMedicine = selectedMedicine;
             name = selectedMedicine.getName();
         }
+    }
+    /**
+     * Want methods that execute the validations as the user
+     * advances across the pages.
+     * gotoStartDate
+     * gotoEndDate
+     * gotoSummary
+     */
+
+    public String gotoStartDate()
+    {
+        logger.info("gotoStartDate");
+        return "setStartDate";
+    }
+
+    public String gotoEndDate()
+    {
+        logger.info("gotoEndDate");
+        return "setEndDate";
+    }
+    public String gotoSummary()
+    {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<PrescriptionFlowBean>> violations = validator.validate(this);
+
+        logger.info("Validation returned " + violations.size());
+
+        for (ConstraintViolation<PrescriptionFlowBean> v: violations)
+        {
+            logger.info("ConstraintViolation = " + v.getMessage());
+        }
+
+        logger.info("gotoSummary");
+
+
+        //  Something needed to convert JSR303 to faces messages.
+
+///     MessageCollection messages = new MessageCollection();
+///     
+///     if (!violations.isEmpty())
+///     {
+///         ConstraintToMessageConverter conv = new ConstraintToMessageConverter();
+
+///         for (ConstraintViolation<PrescriptionFlowBean> c : violations)
+///         {
+///             Message message = conv.getMessage(c);
+///             messages.add(message);
+///         }
+///     }
+
+      //if (jsfUtil.handleErrors(messages, reportErrors))
+        return "summary";
     }
 
     public MedicineBean getSelectedMedicine()
@@ -77,12 +142,6 @@ public class PrescriptionFlowBean implements Serializable
         setSelectedMedicine(med);
     }
 
-    @PostConstruct
-    public void setHandler()
-    {
-        logger.debug("PostConstruct called setting " + medHandler);
-        medLazyList.setHandler(medHandler);
-    }
 
     public String getName() {
         return name;
@@ -129,12 +188,6 @@ public class PrescriptionFlowBean implements Serializable
     public String goStartDate()
     {
         logger.debug("goStartDate");
-
-      //ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-      //Validator validator = factory.getValidator();
-      //Set<ConstraintViolation<PrescriptionFlowBean>> violations = validator.validate(this);
-
-      //logger.debug("Validation found " + violations.size());
 
 ///     MessageCollection messages = new MessageCollection();
 ///     
@@ -200,13 +253,19 @@ public class PrescriptionFlowBean implements Serializable
 
     public LocalDate getEndDate()
     {
-        logger.warn("getEnd called " + endDate);
         return endDate;
     }
 
     public void setEndDate(LocalDate endDate)
     {
-        logger.warn("setStartDate called " + endDate);
         this.endDate = endDate;
     }
+
+  //public interface PrescriptionStartValid extends Default
+  //{
+  //} 
+
+  //public interface PrescriptionDatesValid extends StartDateValid
+  //{
+  //}
 }

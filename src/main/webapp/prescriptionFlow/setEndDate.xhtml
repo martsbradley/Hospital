@@ -38,12 +38,14 @@
                 </span>
             </div>
 
+            <f:validateWholeBean value="#{prescriptionFlowBean}" />
+
             <h:commandButton id="cancel" value="Cancel" 
                             action="returnFromFlow" immediate="true" />
             <h:commandButton id="search" value="Back" 
-                            action="setStartDate" />
+                            action="#{prescriptionFlowBean.goStartDate}" />
             <h:commandButton id="next" value="Next" 
-                            action="summary" />
+                            action="#{prescriptionFlowBean.gotoSummary}" />
         </f:view>
     </h:form>
 </h:body>

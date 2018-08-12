@@ -37,11 +37,11 @@
             </div>
 
             <h:commandButton id="cancel" value="Cancel" 
-                            action="returnFromFlow" immediate="true" />
-            <h:commandButton id="search" value="Back" 
-                            action="setEndDate" />
+                             action="returnFromFlow" immediate="true" />
+            <h:commandButton value="Back" 
+                             action="#{prescriptionFlowBean.gotoEndDate}" />
             <h:commandButton id="next" value="Confirm" 
-                            action="summary" />
+                                       action="summary" />
         </f:view>
     </h:form>
 </h:body>

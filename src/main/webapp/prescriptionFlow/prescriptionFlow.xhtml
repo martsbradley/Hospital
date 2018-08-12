@@ -83,7 +83,7 @@
                         <h:commandButton id="cancel" value="Cancel"
                                                      action="returnFromFlow" immediate="true" />
                         <h:commandButton id="next" value="Next"
-                                                   action="setStartDate" />
+                                                   action="#{prescriptionFlowBean.gotoStartDate}" />
                     </div>
                 </div>
             </p:outputPanel>
