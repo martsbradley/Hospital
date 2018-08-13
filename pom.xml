@@ -17,10 +17,8 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
-        <!-- <maven.compiler.plugin.version>3.7.0-jboss-1</maven.compiler.plugin.version> -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven-war-plugin.verison>3.2.0</maven-war-plugin.verison>
-
         <junit.version>4.12</junit.version>
         <junit.jupiter.version>5.1.0</junit.jupiter.version>
         <junit.platform.version>1.1.0</junit.platform.version>
@@ -62,7 +60,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${maven-war-plugin.verison}</version>
                 <configuration>
-                    <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-12.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
+                    <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -108,7 +106,7 @@
                     <executable>/usr/bin/touch</executable>
                     <workingDirectory>.</workingDirectory>
                     <arguments>
-                        <argument>/home/martin/Software/Java/wildfly/wildfly-12.0.0.Final/standalone/deployments/firstcup.war.dodeploy</argument>
+                        <argument>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war.dodeploy</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -186,10 +184,10 @@
             <version>3.7</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <version>2.2.16</version>
-            <scope>test</scope>
+            <groupId>javax.faces</groupId>
+            <artifactId>javax.faces-api</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -209,10 +207,8 @@
             <version>10.14.2.0</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.hibernate</groupId>
-            <!--   <artifactId>hibernate-entitymanager</artifactId> -->
             <artifactId>hibernate-core</artifactId>
             <version>5.2.17.Final</version>
             <scope>test</scope>
