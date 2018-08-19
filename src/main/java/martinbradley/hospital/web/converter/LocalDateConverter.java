@@ -21,13 +21,13 @@ public class LocalDateConverter implements Converter
                               UIComponent component, 
                               String value)
     {
-        logger.warn("getAsObject received " + value);
+        logger.debug("getAsObject received " + value);
         LocalDate date = null;
         try {
             DateTimeFormatter dft = getFormatter();
 
             date = LocalDate.parse(value, dft);
-            logger.warn("Converted to " + date);
+            logger.debug(String.format("getAsObject date as '%s'", date));
         }
         catch (DateTimeParseException exc) {
             logger.warn("Failed to convert " + value);
@@ -40,6 +40,7 @@ public class LocalDateConverter implements Converter
     {
         FacesMessage message = new FacesMessage("invalid date,","invalid date");
         message.setSeverity(FacesMessage.SEVERITY_ERROR);
+        logger.warn(aText);
         throw new ConverterException(message);
     }
 
@@ -59,7 +60,7 @@ public class LocalDateConverter implements Converter
             DateTimeFormatter dft = getFormatter();
 
             result = date.format(dft);
-            logger.warn("Sending date as " + result);
+            logger.debug(String.format("getAsString sending date as '%s'", result));
         }
         catch(Exception e)
         {

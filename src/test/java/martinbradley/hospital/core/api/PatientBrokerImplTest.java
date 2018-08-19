@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.ArrayList;
 
 public class PatientBrokerImplTest
 {
@@ -116,7 +117,7 @@ public class PatientBrokerImplTest
         patient.setSurname("Bradley");
         patient.setDob(LocalDate.now());
         patient.setSex(Sex.Male);
-        patient.setPrescription(new HashSet<Prescription>());
+        patient.setPrescription(new ArrayList<Prescription>());
 
         new Expectations(){{
             mockRepo.loadById(anyLong); result= patient;

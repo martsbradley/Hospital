@@ -5,8 +5,8 @@
     </encoder>
   </appender>
 
-  <logger name="org" level="WARN"/>
-  <logger name="org.hibernate" level="WARN"/>
+  <logger name="org" level="INFO"/>
+  <logger name="org.hibernate" level="INFO"/>
   <logger name="org.hibernate.SQL" level="DEBUG"/>
 
   <root level="DEBUG">

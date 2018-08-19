@@ -49,6 +49,7 @@ public class TestDatabase
 
     private static void deleteOldDBFiles() //throws Exception
     {
+        log.info("DELETE old files");
         try {
             Path path = new File("myDerbyDB").toPath();
 
@@ -159,18 +160,25 @@ public class TestDatabase
     @AfterAll
     public static void tearDown() throws Exception
     {
-          deleteOldDBFiles();
+          //deleteOldDBFiles();
     }
 
-    private static Patient createPatient(EntityManager em,
-                                  String forename, 
-                                  String surname)
+    private static Patient newPatient(String forename, 
+                                      String surname)
     {
         Patient p = new Patient();
         p.setForename(forename);
         p.setSurname(surname);
         p.setDob(LocalDate.now());
         p.setSex(Sex.Male);
+        return p;
+    }
+
+    private static Patient createPatient(EntityManager em,
+                                  String forename, 
+                                  String surname)
+    {
+        Patient p = newPatient(forename, surname);
         em.persist(p);
 
         String msg = String.format("Patient %d %s %s persisted",
@@ -208,7 +216,7 @@ public class TestDatabase
         p.setMedicineId(medicine);
         p.setStartDate(LocalDate.now());
         p.setEndDate(LocalDate.now());
-        p.setAmount("tonnes");
+        p.setAmount("heaps");
 
         em.persist(p);
 
@@ -275,7 +283,7 @@ public class TestDatabase
 
         em.close();// Important as no more loading of SQL 
         
-        Set<Prescription> tablets = p.getPrescription();
+        List<Prescription> tablets = p.getPrescription();
 
         log.info("tablets are " + tablets);
         log.info(String.format("loaded patient and it has %d prescriptions",
@@ -289,6 +297,65 @@ public class TestDatabase
         }
         log.info("______________endtest....ensure_loadPatient_works");
     }
+
+    @Test
+    public void add_another_prescription() throws Exception
+    {
+        log.info("______________starttest...add_another_prescription");
+        EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("testingUnit");
+        EntityManager em = emFactory.createEntityManager();
+        PatientDBRepo repo = new PatientDBRepo();
+        repo.tx = new UserTransactionAdapter(em.getTransaction());
+        repo.entityManager = em;
+
+        em.getTransaction().begin();
+        Patient p = repo.loadById(10);
+
+        log.info("Got patient p"  + p);
+
+        List<Prescription> tablets = p.getPrescription();
+
+        log.info("tablets are " + tablets);
+        log.info(String.format("loaded patient and it has %d prescriptions",
+                                    tablets.size()));
+        log.info("Name... [" + p.getForename() + "  " + p.getSurname() + "]");
+
+        Medicine med = null;
+
+        for (Prescription pres: tablets)
+        {
+            med = pres.getMedicine();
+            log.info(String.format("%d  %s",med.getId(),med.getName()));
+        }
+
+        Prescription tab = new Prescription();
+        tab.setPatient(p);
+        tab.setMedicineId(med);
+        tab.setStartDate(LocalDate.now());
+        tab.setEndDate(LocalDate.now());
+        tab.setAmount("good lot");
+
+        p.getPrescription().add(tab);
+        log.info("********persist called");
+        em.persist(tab);
+
+        log.info("What we got now???");
+
+        Patient pagain = repo.loadById(10);
+
+        for (Prescription tabx : pagain.getPrescription())
+        {
+            log.info(tabx.toString());
+        }
+        em.getTransaction().commit();
+        em.close();
+
+
+        log.info("Finished add_another_prescription");
+    }
+
+
+
 
     @Test
     public void deleteAllPatientPrescriptions() throws Exception

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @ViewScoped
 public class PatientBean implements Serializable
 {
-    private long id;
+    private Long id;
     @Size(min=1, max=15)
     private String forename;
     @Size(min=1, max=20)
@@ -29,10 +29,10 @@ public class PatientBean implements Serializable
     {
         logger.info("PatientBean was created");
     }
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getForename() {

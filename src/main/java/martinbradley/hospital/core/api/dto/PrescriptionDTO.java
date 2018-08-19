@@ -8,7 +8,7 @@ import javax.validation.constraints.*;
 public class PrescriptionDTO implements Serializable
 {
     private static final Logger logger = LoggerFactory.getLogger(PrescriptionDTO.class);
-    private long id;
+    private Long id;
 
     @NotNull
     private PatientDTO patient;
@@ -25,12 +25,12 @@ public class PrescriptionDTO implements Serializable
     @NotNull
     private MedicineDTO medicine;
 
-    public long getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(long id)
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -83,5 +83,23 @@ public class PrescriptionDTO implements Serializable
     public void setMedicine(MedicineDTO medicine)
     {
         this.medicine = medicine;
+    }
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("PrescriptionDTO [");
+        if (patient != null)
+        {
+            sb.append("for " );
+            sb.append(patient.getForename());
+        }
+        else
+        {
+            sb.append("Without Patient!!");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

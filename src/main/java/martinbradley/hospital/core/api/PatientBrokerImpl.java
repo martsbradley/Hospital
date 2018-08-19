@@ -12,7 +12,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import martinbradley.hospital.core.api.dto.PatientDTO;
-import martinbradley.hospital.core.domain.Patient;
+import martinbradley.hospital.core.domain.*;
 import martinbradley.hospital.persistence.repository.PatientDBRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +76,14 @@ public class PatientBrokerImpl implements PatientBroker
 
         Patient pat = mapper.dtoToPatient(aPatientDTO);
         logger.info("Converted to the pat " + pat);
+
+
+        List<Prescription> pres = pat.getPrescription();
+        for (Prescription p : pres)
+        {
+            p.setPatient(pat);
+        }
+
         SavePatientResponse response = repo.savePatient(pat);
 
         PatientDTO savedPatientDTO = mapper.patientToDTO(response.getPatient());
@@ -122,11 +130,11 @@ public class PatientBrokerImpl implements PatientBroker
         Patient loadedPatient = repo.loadById(id);
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
         PatientDTO dto = mapper.patientToDTO(loadedPatient);
-      //logger.info(String.format("Loaded(%d) and got %s",id,dto));
-      //for (PrescriptionDTO p : dto.getPrescription())
-      //{
-      //    logger.info("---> A prescription" + p);
-      //}
+        logger.info(String.format("Loaded(%d) and got %s",id,dto));
+        for (PrescriptionDTO p : dto.getPrescription())
+        {
+            logger.info("---> A prescription" + p);
+        }
         return dto;
     }
 }

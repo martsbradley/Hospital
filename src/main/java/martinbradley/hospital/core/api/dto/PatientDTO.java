@@ -8,7 +8,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 public class PatientDTO implements Serializable
 {
-    private long id;
+    private Long id;
     @Size(min=1, max=15)
     private String forename;
 
@@ -47,10 +47,10 @@ public class PatientDTO implements Serializable
         return this.messages;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getForename() {

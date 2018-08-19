@@ -33,9 +33,10 @@
                 <h:outputLabel for="endDate" class="col-sm-2 col-form-label">End Date</h:outputLabel>
 
                 <span class="col-sm-2 col-form-label" id="endDate">
-                    <e:date title="Ending Date" dateValue="#{prescriptionFlowBean.endDate}" >
-                        <f:validateBean validationGroups="javax.validation.groups.Default,java.util.RandomAccess"/>
+                    <e:date id="enddate" title="Ending Date" dateValue="#{prescriptionFlowBean.endDate}" >
+                         <f:validateBean for="enddate" validationGroups="java.util.RandomAccess"/>
                     </e:date>
+                    <h:messages for="marty" class="error" />
                 </span>
             </div>
 
@@ -43,12 +44,13 @@
             <h:commandButton id="cancel" value="Cancel" 
                             action="returnFromFlow" immediate="true" />
             <h:commandButton id="search" value="Back" 
+                            immediate="true"
                             action="#{prescriptionFlowBean.goStartDate}" />
             <h:commandButton id="next" value="Next" 
                             action="#{prescriptionFlowBean.gotoSummary}" />
 
-            <f:validateWholeBean value="#{prescriptionFlowBean}"
-                                 validationGroups="java.util.RandomAccess" />
+	    <f:validateWholeBean id="marty" value="#{prescriptionFlowBean}" 
+		validationGroups="java.util.RandomAccess"/>
     </h:form>
 </h:body>
 </html>

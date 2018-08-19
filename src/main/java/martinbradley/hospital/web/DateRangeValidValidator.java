@@ -19,27 +19,17 @@ public class DateRangeValidValidator implements ConstraintValidator<DateRangeVal
     public boolean isValid(final LocalDateRange range, final ConstraintValidatorContext context)
     {
         logger.info("Running the validation");
-        try///TODO Never try -Homer!, this try is unnecessary
-        {
-            LocalDate startDate = range.getStartDate();
-            LocalDate endDate = range.getEndDate();
+        LocalDate startDate = range.getStartDate();
+        LocalDate endDate = range.getEndDate();
 
-            if (startDate == null || endDate == null)
-            {
-                logger.info("a date is null");
-                return false;
-            }
-
-            boolean isBefore  = startDate.isBefore(endDate);
-            logger.info(startDate + " isBefore " + endDate + " = " + isBefore);
-            return isBefore;
-        }
-        catch (final Exception ignore)
+        if (startDate == null || endDate == null)
         {
-            logger.warn(ignore.getMessage());
+            logger.warn("a date is null");
+            return false;
         }
-        return true;
+
+        boolean isBefore  = startDate.isBefore(endDate);
+        logger.info(startDate + " isBefore " + endDate + " = " + isBefore);
+        return isBefore;
     }
-
-
 }

@@ -1,4 +1,5 @@
 package martinbradley.hospital.web.flow.prescription;
+import martinbradley.hospital.web.beans.*;
 
 import java.io.Serializable;
 import javax.faces.flow.FlowScoped;
@@ -6,6 +7,7 @@ import org.primefaces.event.SelectEvent;
 import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import martinbradley.hospital.web.api.MedicineHandler;
+import martinbradley.hospital.web.api.PatientHandler;
 import martinbradley.hospital.web.beans.MedicineBean;
 import java.util.List;
 import java.util.Collections;
@@ -26,7 +28,6 @@ import javax.faces.component.UIOutput;
 import martinbradley.hospital.core.api.dto.ConstraintToMessageConverter;
 import martinbradley.hospital.core.api.dto.Message;
 import martinbradley.hospital.core.api.dto.MessageCollection;
-import martinbradley.jsf.util.JSFUtil;
 import java.time.LocalDate;
 import martinbradley.hospital.web.DateRangeValid;
 import martinbradley.hospital.web.LocalDateRange;
@@ -38,18 +39,20 @@ import javax.validation.ValidatorFactory;
 
 @Named
 @FlowScoped("prescriptionFlow")
-@DateRangeValid
+@DateRangeValid(groups=java.util.RandomAccess.class)
 public class PrescriptionFlowBean implements Serializable, LocalDateRange
 {
-    //private JSFUtil jsfUtil = new JSFUtil();
     private static final Logger logger = LoggerFactory.getLogger(PrescriptionFlowBean.class);
     private static final long serialVersionUID = 1L;
     @Inject MedicineHandler medHandler;
+    @Inject PatientHandler patientHandler;
 
     private Long patientId;
     @NotNull private MedicineBean selectedMedicine;
-    private LocalDate startDate;//= LocalDate.now();
-    private LocalDate endDate  ;//= LocalDate.now();
+
+    @Future
+    private LocalDate startDate = LocalDate.now().plusDays(1);
+    private LocalDate endDate   = LocalDate.now();
 
     private String name = "";
     private String medicineSearch;
@@ -91,41 +94,31 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
     public String gotoEndDate()
     {
         logger.info("gotoEndDate");
+        endDate = startDate.plusDays(1);
         return "setEndDate";
     }
+
     public String gotoSummary()
     {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<PrescriptionFlowBean>> violations = validator.validate(this);
-
-        logger.info("Validation returned " + violations.size());
-
-        for (ConstraintViolation<PrescriptionFlowBean> v: violations)
-        {
-            logger.info("ConstraintViolation = " + v.getMessage());
-        }
-
-        logger.info("gotoSummary");
-
-
-        //  Something needed to convert JSR303 to faces messages.
-
-///     MessageCollection messages = new MessageCollection();
-///     
-///     if (!violations.isEmpty())
-///     {
-///         ConstraintToMessageConverter conv = new ConstraintToMessageConverter();
-
-///         for (ConstraintViolation<PrescriptionFlowBean> c : violations)
-///         {
-///             Message message = conv.getMessage(c);
-///             messages.add(message);
-///         }
-///     }
-
-      //if (jsfUtil.handleErrors(messages, reportErrors))
         return "summary";
+    }
+
+    public String addPrescription()
+    {
+        PrescriptionBean prescription = new PrescriptionBean();
+        prescription.setStartDate(startDate);
+        prescription.setEndDate(endDate);
+        prescription.setMedicine(selectedMedicine);
+        prescription.setAmount("Intravenous");
+
+        PatientBean patient = patientHandler.loadById(patientId);
+        List<PrescriptionBean> prescriptions = patient.getPrescription();
+        prescriptions.add(prescription);
+        patient.setPrescription(prescriptions);
+
+        patientHandler.savePatient(patient);
+
+        return "/patient.xhtml?id="+patientId;
     }
 
     public MedicineBean getSelectedMedicine()
@@ -189,24 +182,6 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
     {
         logger.debug("goStartDate");
 
-///     MessageCollection messages = new MessageCollection();
-///     
-///     if (!violations.isEmpty())
-///     {
-///         ConstraintToMessageConverter conv = new ConstraintToMessageConverter();
-
-///         for (ConstraintViolation<PrescriptionFlowBean> c : violations)
-///         {
-///             Message message = conv.getMessage(c);
-///             messages.add(message);
-///         }
-///     }
-
-      //if (jsfUtil.handleErrors(messages, reportErrors))
-      //{
-      //    return null;
-      //}
-
         return "setStartDate";
     }
 
@@ -225,20 +200,9 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
 
     public MedicineLazyList getPagedMeds()
     {
-
         return medLazyList;
     }
-    /*
-    private UIOutput reportErrors;
-    public UIOutput getReportErrors()
-    {
-        return this.reportErrors;
-    }
-    public void setReportErrors(UIOutput reportErrors)
-    {
-        this.reportErrors = reportErrors;
-    }
-    */
+
     public LocalDate getStartDate()
     {
         logger.warn("getStartDate called " + startDate);
@@ -260,12 +224,4 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
     {
         this.endDate = endDate;
     }
-
-  //public interface PrescriptionStartValid extends Default
-  //{
-  //} 
-
-  //public interface PrescriptionDatesValid extends StartDateValid
-  //{
-  //}
 }

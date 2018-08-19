@@ -19,7 +19,7 @@ public class Prescription
     @SequenceGenerator(name="prescription_pk_sequence",sequenceName="prescription_id_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="prescription_pk_sequence")
     @Column(name="id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name="medicine_id")
@@ -38,12 +38,12 @@ public class Prescription
     @Column(name="amount")
     private String amount;
 
-    public long getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(long id)
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -96,5 +96,30 @@ public class Prescription
     public void setMedicineId(Medicine medicine)
     {
         this.medicine = medicine;
+    }
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Prescription [");
+        sb.append(id);
+        sb.append(",");
+        sb.append(startDate);
+        sb.append(",");
+        sb.append(endDate);
+        sb.append(",");
+        sb.append(amount);
+        if (patient != null)
+        {
+            sb.append(", patient forename");
+            sb.append(patient.getForename());
+        }
+        else
+        {
+            sb.append(" patient is null");
+        }
+
+        sb.append("]");
+        return sb.toString();
     }
 }

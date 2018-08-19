@@ -1,7 +1,7 @@
 package martinbradley.hospital.core.domain;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.Column;
@@ -47,7 +47,7 @@ public class Patient
     private Sex sex;
     
     @OneToMany(fetch=FetchType.LAZY, mappedBy = "patient")
-    private Set<Prescription> prescription = new HashSet<>();
+    private List<Prescription> prescription = new ArrayList<>();
 
     @Column(name="dateofbirth")
     private LocalDate dob;
@@ -85,21 +85,43 @@ public class Patient
         this.sex = sex;
     }
 
-    public Set<Prescription> getPrescription()
+    public List<Prescription> getPrescription()
     {
+        if (prescription == null)
+        {
+            prescription = new ArrayList<>();
+        }
         return prescription;
     }
-    public void setPrescription(Set<Prescription> prescription)
+    public void setPrescription(List<Prescription> prescription)
     {
         this.prescription = prescription;
     }
     @Override
     public String toString()
     {
-        return "Patient [" + id + ", " 
-                           + forename + "," 
-                           + surname + "," 
-                           + dob  +"]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Patient [");
+        sb.append(id);
+        sb.append(",");
+        sb.append(forename);
+        sb.append(",");
+        sb.append(surname);
+        sb.append(",");
+        sb.append(dob);
+        sb.append("]");
+
+        sb.append("Prescriptions\n[\n");
+        if (prescription != null)
+        {
+            for (Prescription p : prescription)
+            {
+                sb.append("\n");
+                sb.append(p);
+            }
+        }
+        sb.append("\n]\n");
+        return sb.toString();
     }
 
     public static enum SortOrder

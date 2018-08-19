@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
-import martinbradley.hospital.core.domain.Patient;
+import martinbradley.hospital.core.domain.*;
 import martinbradley.hospital.core.domain.SavePatientResponse;
 import mockit.*;
 import org.junit.jupiter.api.Test;
@@ -90,5 +90,21 @@ public class PatientDBRepoTest
 
         boolean thereAreErrors = response.getMessages().iterator().hasNext();
         assertThat(thereAreErrors, is(true));
+    }
+
+    @Test
+    public void save_prescriptions(@Mocked TypedQuery playerQuery)
+    {
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setForename("martin");
+        patient.setSurname("martin");
+
+        Prescription p = new Prescription();
+        p.setAmount("amount");
+
+        patient.getPrescription().add(p);
+
+        SavePatientResponse response = impl.savePatient(patient);
     }
 }

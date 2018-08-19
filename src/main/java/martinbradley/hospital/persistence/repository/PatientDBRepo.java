@@ -81,7 +81,7 @@ public class PatientDBRepo
             qDeleteVisitors.setParameter(1, tabletIds);
             qDeleteVisitors.executeUpdate();
 
-            aPatient.setPrescription(Collections.emptySet());
+            aPatient.setPrescription(Collections.emptyList());
 
             logger.info("calling remove");
             entityManager.remove(aPatient);
@@ -136,11 +136,11 @@ public class PatientDBRepo
 
             if (aPatient.getId() == null)
             {
-                entityManager.persist(aPatient);
+              entityManager.persist(aPatient);
             }
             else
             {
-                entityManager.merge(aPatient);
+              entityManager.merge(aPatient);
             }
 
             logger.info("save returning " + aPatient.getId());
@@ -196,7 +196,7 @@ public class PatientDBRepo
 
         for (Patient p : patients)
         {
-            p.setPrescription(Collections.emptySet());
+            p.setPrescription(Collections.emptyList());
         }
         return patients;
     }

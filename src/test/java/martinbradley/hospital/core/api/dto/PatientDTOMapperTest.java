@@ -11,6 +11,7 @@ import org.mapstruct.factory.Mappers;
 import martinbradley.hospital.core.domain.Sex;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class PatientDTOMapperTest
         patient.setSurname("Bradley");
         patient.setDob(LocalDate.now());
         patient.setSex(Sex.Male);
-        patient.setPrescription(new HashSet<Prescription>());
+        patient.setPrescription(new ArrayList<Prescription>());
 
         PatientDTO dto = mapper.patientToDTO(patient);
 
