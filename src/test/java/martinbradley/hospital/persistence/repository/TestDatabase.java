@@ -309,16 +309,12 @@ public class TestDatabase
         repo.entityManager = em;
 
         em.getTransaction().begin();
-        Patient p = repo.loadById(10);
+        Patient patient = repo.loadById(10);
 
-        log.info("Got patient p"  + p);
 
-        List<Prescription> tablets = p.getPrescription();
+        List<Prescription> tablets = patient.getPrescription();
 
-        log.info("tablets are " + tablets);
-        log.info(String.format("loaded patient and it has %d prescriptions",
-                                    tablets.size()));
-        log.info("Name... [" + p.getForename() + "  " + p.getSurname() + "]");
+        log.info(patient.toString());
 
         Medicine med = null;
 
@@ -327,26 +323,37 @@ public class TestDatabase
             med = pres.getMedicine();
             log.info(String.format("%d  %s",med.getId(),med.getName()));
         }
+        em.detach(patient);
+
+        em.getTransaction().commit();
+
+        log.info("Adding another prescription");
+
+        em.getTransaction().begin();
 
         Prescription tab = new Prescription();
-        tab.setPatient(p);
+        tab.setPatient(patient);
         tab.setMedicineId(med);
         tab.setStartDate(LocalDate.now());
         tab.setEndDate(LocalDate.now());
         tab.setAmount("good lot");
 
-        p.getPrescription().add(tab);
-        log.info("********persist called");
-        em.persist(tab);
+        patient.getPrescription().add(tab);
 
-        log.info("What we got now???");
+        log.info("********merge***************");
 
-        Patient pagain = repo.loadById(10);
+        em.merge(patient);
 
-        for (Prescription tabx : pagain.getPrescription())
-        {
-            log.info(tabx.toString());
-        }
+        em.getTransaction().commit();
+
+        em.getTransaction().begin();
+
+        log.info("After the merge");
+
+        patient = repo.loadById(10);
+
+        log.info(patient.toString());
+
         em.getTransaction().commit();
         em.close();
 

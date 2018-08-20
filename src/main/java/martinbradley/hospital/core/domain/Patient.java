@@ -46,7 +46,7 @@ public class Patient
     @Column(name="sex")
     private Sex sex;
     
-    @OneToMany(fetch=FetchType.LAZY, mappedBy = "patient")
+    @OneToMany(fetch=FetchType.LAZY, mappedBy = "patient",  cascade=CascadeType.ALL)
     private List<Prescription> prescription = new ArrayList<>();
 
     @Column(name="dateofbirth")
@@ -87,10 +87,10 @@ public class Patient
 
     public List<Prescription> getPrescription()
     {
-        if (prescription == null)
-        {
-            prescription = new ArrayList<>();
-        }
+      //if (prescription == null)
+      //{
+      //    prescription = new ArrayList<>();
+      //}
         return prescription;
     }
     public void setPrescription(List<Prescription> prescription)

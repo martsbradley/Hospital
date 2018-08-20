@@ -118,8 +118,27 @@ public class PatientDBRepo
     public SavePatientResponse savePatient(Patient aPatient)
     {
         aPatient.setSex(Sex.Male);
+        logger.info("Save called xxxx.:" + aPatient);
 
-        logger.info("Save called :" + aPatient);
+        //Test code
+        //
+        //
+        Medicine patsy = entityManager.find(Medicine.class, 1L);
+        for (Prescription prescription : aPatient.getPrescription())
+        {
+            if (prescription.getMedicine() == null)
+            {
+                logger.info("Setting patsy as " + patsy);
+                prescription.setMedicineId(patsy);
+            }
+            else
+            {
+                logger.info("medicine not null");
+            }
+
+        }
+
+
         try{
             tx.begin();
 
@@ -136,11 +155,14 @@ public class PatientDBRepo
 
             if (aPatient.getId() == null)
             {
-              entityManager.persist(aPatient);
+                logger.info("Calling persist");
+                entityManager.persist(aPatient);
             }
             else
             {
-              entityManager.merge(aPatient);
+                logger.info("Calling merge");
+                entityManager.merge(aPatient);
+                //aPatient.setPrescription(Collections.emptyList());
             }
 
             logger.info("save returning " + aPatient.getId());
@@ -148,7 +170,6 @@ public class PatientDBRepo
         catch (Exception e)
         {
             logger.warn("Error saving Patient " + e.getClass().getName());
-            e.printStackTrace();
 
             try{
                 tx.rollback();

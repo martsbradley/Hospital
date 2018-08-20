@@ -10,11 +10,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name="prescription")
 public class Prescription
 {
+    private static final Logger logger = LoggerFactory.getLogger(Prescription.class);
     @Id 
     @SequenceGenerator(name="prescription_pk_sequence",sequenceName="prescription_id_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="prescription_pk_sequence")
@@ -111,7 +114,7 @@ public class Prescription
         sb.append(amount);
         if (patient != null)
         {
-            sb.append(", patient forename");
+            sb.append(", patient forename ");
             sb.append(patient.getForename());
         }
         else
@@ -119,7 +122,46 @@ public class Prescription
             sb.append(" patient is null");
         }
 
+        if (medicine != null)
+        {
+            sb.append(", med forename ");
+            sb.append(medicine.getName());
+        }
+        else
+        {
+            sb.append(", medicine is Null");
+        }
         sb.append("]");
         return sb.toString();
+    }
+    @Override
+    public boolean equals(Object aObject)
+    {
+        if (aObject == null || 
+            !(aObject instanceof Prescription))
+        {
+            logger.info("equals false wrong type");
+            return false;
+        }
+
+        Prescription other = (Prescription)aObject;
+
+        if (id == null || other.id == null)
+        {
+            logger.info("equals false id null");
+            return false;
+        }
+
+        boolean result = id == other.id;
+        logger.info("equals " + result);
+        return result;
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        int result = 17;
+        result = 31 * result + id.hashCode();
+        return result;
     }
 }
