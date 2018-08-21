@@ -96,7 +96,7 @@ public class Prescription
         return medicine;
     }
 
-    public void setMedicineId(Medicine medicine)
+    public void setMedicine(Medicine medicine)
     {
         this.medicine = medicine;
     }

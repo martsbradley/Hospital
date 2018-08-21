@@ -120,25 +120,6 @@ public class PatientDBRepo
         aPatient.setSex(Sex.Male);
         logger.info("Save called xxxx.:" + aPatient);
 
-        //Test code
-        //
-        //
-        Medicine patsy = entityManager.find(Medicine.class, 1L);
-        for (Prescription prescription : aPatient.getPrescription())
-        {
-            if (prescription.getMedicine() == null)
-            {
-                logger.info("Setting patsy as " + patsy);
-                prescription.setMedicineId(patsy);
-            }
-            else
-            {
-                logger.info("medicine not null");
-            }
-
-        }
-
-
         try{
             tx.begin();
 

@@ -51,6 +51,7 @@ public class PatientHandler
     {
         logger.info("Save Patient: " + patientBean);
         PatientDTO patient = mapper.beanToDTO(patientBean);
+        logger.info("Save PatientDTO: " + patientBean);
 
         PatientDTO response = patientBroker.savePatient(patient);
         //logger.info("Save Patient: violations " + violations.size());

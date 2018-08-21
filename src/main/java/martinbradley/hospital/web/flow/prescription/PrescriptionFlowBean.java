@@ -111,7 +111,12 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
         prescription.setMedicine(selectedMedicine);
         prescription.setAmount("Intravenous");
 
+        logger.info("addPrescription now load the patient " + patientId);
         PatientBean patient = patientHandler.loadById(patientId);
+
+        logger.info("Loaded " + patient);
+
+
         List<PrescriptionBean> prescriptions = patient.getPrescription();
         prescriptions.add(prescription);
         patient.setPrescription(prescriptions);

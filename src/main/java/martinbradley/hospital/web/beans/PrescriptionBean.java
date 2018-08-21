@@ -12,6 +12,7 @@ import javax.validation.constraints.*;
 public class PrescriptionBean implements Serializable
 {
     private Long id;
+    private PatientBean patient;
     private LocalDate startDate, endDate;
     private String amount;
     private MedicineBean medicine;
@@ -24,6 +25,15 @@ public class PrescriptionBean implements Serializable
     public void setId(Long id)
     {
         this.id = id;
+    }
+
+    public PatientBean getPatient()
+    {
+        return patient;
+    }
+    public void setPatient(PatientBean patient)
+    {
+        this.patient = patient;
     }
 
     public LocalDate getStartDate()
@@ -75,6 +85,10 @@ public class PrescriptionBean implements Serializable
         sb.append(this.startDate);
         sb.append(" Amount:");
         sb.append(this.amount);
+        sb.append(" ,");
+        sb.append(patient == null? " patient is null ": patient.getForename());
+        sb.append(" ,");
+        sb.append(medicine == null? " med is null ": medicine.getName());
         sb.append("]");
         return sb.toString();
     }

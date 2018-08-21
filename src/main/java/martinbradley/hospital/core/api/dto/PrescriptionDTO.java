@@ -35,12 +35,12 @@ public class PrescriptionDTO implements Serializable
         this.id = id;
     }
 
-    public PatientDTO getPatientDTO()
+    public PatientDTO getPatient()
     {
         return patient;
     }
 
-    public void setPatientDTO(PatientDTO patient)
+    public void setPatient(PatientDTO patient)
     {
         this.patient = patient;
     }

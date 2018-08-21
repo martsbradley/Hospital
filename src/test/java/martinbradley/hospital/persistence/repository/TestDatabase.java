@@ -213,7 +213,7 @@ public class TestDatabase
     {
         Prescription p = new Prescription();
         p.setPatient(patient);
-        p.setMedicineId(medicine);
+        p.setMedicine(medicine);
         p.setStartDate(LocalDate.now());
         p.setEndDate(LocalDate.now());
         p.setAmount("heaps");
@@ -333,7 +333,7 @@ public class TestDatabase
 
         Prescription tab = new Prescription();
         tab.setPatient(patient);
-        tab.setMedicineId(med);
+        tab.setMedicine(med);
         tab.setStartDate(LocalDate.now());
         tab.setEndDate(LocalDate.now());
         tab.setAmount("good lot");
