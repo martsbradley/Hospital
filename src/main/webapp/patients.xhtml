@@ -20,7 +20,7 @@
         <h:outputLabel id="messages" value="" binding="#{patientPaged.reportErrors}"/>
         <h:message for="messages" class="error" />
 
-        <h:panelGroup rendered="#{patientPaged.listing}">
+        <h:panelGroup>
             <p:dataTable id="lazyDataTable" value="#{patientPaged.allPlayers}" var="player" paginator="true" rows="5"
                   rowKey="#{player.id}" paginatorPosition="bottom"
         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -54,87 +54,10 @@
                     </h:link>
                 </p:column>
             </p:dataTable>
-            <h:commandButton id="new" value="New" action="#{patientPaged.startCreatePatient()}" immediate="true"  />
+            <h:commandButton id="new" value="New" action="patient" immediate="true"  />
             <h:button id="back" value="Cancel" outcome="greeting" />
         </h:panelGroup>
 
-
-        <h:panelGroup rendered="#{patientPaged.editing}">
-            <div class="form-group">
-                <h2>Basic Information</h2>
-                <e:patient title="" patient="#{patientPaged.selectedPatient}" />
-
-                <ui:remove>
-                   <table border="1">
-                   <ui:repeat value="#{patientPaged.selectedPatient.prescription}" var="prescription">
-                       <tr>
-                           <td><h:outputText value="#{prescription.id}"/></td>
-                           <td><h:outputText value="#{prescription.startDate}"/></td>
-                           <td><h:outputText value="#{prescription.endDate}"/></td>
-                           <td><h:outputText value="#{prescription.amount}"/></td>
-                           <td><h:outputText value="#{prescription.medicine}"/></td>
-                       </tr>
-                   </ui:repeat>
-                   </table>
-                </ui:remove>
-
-                <hr/>
-
-                <h2>Prescriptions</h2>
-                <!--
-                            <h:commandLink action="#{prescriptionCtrl.newPrescription(patientPaged.selectedPatient)}" >
-                            -->
-                            <h:commandLink action="findMedicine">
-                                    <h:outputText value="New" />
-                            </h:commandLink>
-                <p:dataTable id="prescriptionTable" value="#{patientPaged.selectedPatient.prescription}" var="prescription" paginator="false" rowKey="#{prescription.id}" >
-                   <p:column sortBy="#{prescription.id}">
-                        <f:facet name="header">Id</f:facet>
-                            <h:commandLink action="#{prescriptionCtrl.startEdit(prescription)}" >
-                                    <h:outputText value="#{prescription.id}" />
-                            </h:commandLink>
-                   </p:column>
-                   <p:column sortBy="#{prescription.startDate}">
-                        <f:facet name="header">Starting</f:facet>
-                            <h:outputText value="#{prescription.startDate}" />
-                   </p:column>
-                   <p:column sortBy="#{prescription.endDate}">
-                        <f:facet name="header">Ending</f:facet>
-                            <h:outputText value="#{prescription.endDate}" />
-                   </p:column>
-                   <p:column sortBy="#{prescription.amount}">
-                        <f:facet name="header">Quantity</f:facet>
-                            <h:outputText value="#{prescription.amount}" />
-                   </p:column>
-                   <p:column sortBy="#{prescription.medicine}">
-                        <f:facet name="header">Medicine</f:facet>
-                            <h:outputText value="#{prescription.medicine.name}" />
-                   </p:column>
-                </p:dataTable>
-
-                <hr/>
-                <h:commandButton id="submitSave" value="Save"
-                                action="${patientPaged.saveSelectedPatient()}" />
-
-                <h:commandButton id="submitDelete" value="Delete"   
-                               action="#{patientPaged.deleteSelectedPatient()}" />
-
-                <h:commandButton id="cancelSave" value="Cancel" 
-                               action="#{patientPaged.cancel()}" immediate="true" />
-            </div>
-        </h:panelGroup>
-
-        <h:panelGroup rendered="#{patientPaged.creating}">
-            <div class="form-group">
-                <e:patient title="Add Patient" patient="#{patientPaged.selectedPatient}" />
-
-                <h:commandButton id="submitAdd" value="Add"
-                                 action="${patientCtrl.saveSelectedPatient(patientPaged.selectedPatient)}" />
-
-                <h:commandButton id="cancelAdd" value="Cancel" 
-                                action="#{patientPaged.cancel()}" immediate="true" />
-           </div>
-        </h:panelGroup>
         </h:form>
     </f:view>
 </h:body>

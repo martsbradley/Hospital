@@ -33,135 +33,13 @@ public class PatientPaged implements Serializable
     private static final Logger logger = LoggerFactory.getLogger(PatientPaged.class);
     private static final long serialVersionUID = 1L;
     private PatientLazyList patientList = this.new PatientLazyList();
+    private UIOutput reportErrors;
     @Inject private PatientHandler patientHandler;
-    private PatientBean selectedPatient;
-    private Status status = Status.LISTING;
 
-    enum Status {
-        LISTING,
-        EDIT,
-        CREATE
-    }
-
-    public PatientBean getSelectedPatient()
-    {
-        return selectedPatient;
-    }
-    public void setSelectedPatient(PatientBean selectedPatient)
-    {
-        logger.debug("setSelectedPatient " + selectedPatient);
-        this.selectedPatient = selectedPatient;
-    }
     public LazyDataModel<PatientBean> getAllPlayers() {
         return patientList;
     }
 
-    public void onRowSelect(SelectEvent event) 
-    {
-        logger.debug("PatientLazyList onRowSelect " + event);
-        if (event.getObject() != null)
-        {
-            PatientBean m = (PatientBean) event.getObject();
-            Long id = m.getId();
-            logger.info("onRowSelect " + id);
-            FacesMessage msg = new FacesMessage("PatientBean Selected", String.valueOf(id));
-
-            setSelectedPatient( patientList.getRowData(String.valueOf(id)));
-
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-    }
-
-    public String startCreatePatient()
-    {
-        setSelectedPatient(new PatientBean());
-        status = Status.CREATE;
-        return "";
-    }
-
-
-    @ManagedProperty(value = "#{patientBean}")
-    private PatientBean patientBean;
-
-    public void setPatientBean(PatientBean patientBean)
-    {
-        this.patientBean = patientBean;
-    }
-    public PatientBean getPatientBean()
-    {
-        return this.patientBean;
-    }
-
-    public String startEditMyPatient(PatientBean patient)
-    {
-        logger.info("edit() and selectedPatient = " + selectedPatient);
-        PatientBean loadedPatient = patientHandler.loadById(patient.getId());
-        logger.info("loadedPatient '" + loadedPatient.getForename() + "'");
-        setSelectedPatient(loadedPatient);
-        startEditPatient();
-
-        Map<String,Object> requestMap =  jsfUtil.getRequestMap();
-
-        PatientBean found = (PatientBean)requestMap.get("patientBean");
-
-        FacesContext context = FacesContext.getCurrentInstance();
-       PatientBean mine = (PatientBean) context.getApplication().
-                         evaluateExpressionGet(context, "#{patient}", 
-                                  PatientBean.class);
-
-        logger.info("Had ..   " + patient);
-        logger.info("Found .. " + found);
-        logger.info("View  .. " + patientBean);
-        logger.info("mine  .. " + mine);
-        return "patient";
-    }
-
-    public String startEditPatient()
-    {
-        status = Status.EDIT;
-
-        return ""; // reload the page
-    }
-
-    public String cancel()
-    {
-        status = Status.LISTING;
-        setSelectedPatient(null);
-        return "";
-    }
-
-    public boolean getListing()
-    {
-        return status == Status.LISTING;
-    }
-
-    public boolean getEditing()
-    {
-        return status == Status.EDIT;
-    }
-
-    public boolean getCreating()
-    {
-        return status == Status.CREATE;
-    }
-
-    public void setEditing(boolean editing)
-    {
-        if (editing)
-            this.status = Status.EDIT;
-        else
-            this.status = Status.LISTING;
-    }
-    
-    public String deleteSelectedPatient()
-    {
-        logger.info("why?? deleteSelectedPatient " + selectedPatient);
-        status = Status.LISTING;
-        patientHandler.deletePatient(selectedPatient);
-        return jsfUtil.redirectToSameView();
-    }
-
-    private UIOutput reportErrors;
     public UIOutput getReportErrors()
     {
         return this.reportErrors;
