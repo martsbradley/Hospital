@@ -123,7 +123,7 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
 
         patientHandler.savePatient(patient);
 
-        return "/patient.xhtml?id="+patientId;
+        return "/patient.xhtml?id="+patientId  +"&faces-redirect=true";
     }
 
     public MedicineBean getSelectedMedicine()

@@ -129,7 +129,7 @@
                 <e:patient title="Add Patient" patient="#{patientPaged.selectedPatient}" />
 
                 <h:commandButton id="submitAdd" value="Add"
-                                 action="${patientPaged.saveSelectedPatient()}" />
+                                 action="${patientCtrl.saveSelectedPatient(patientPaged.selectedPatient)}" />
 
                 <h:commandButton id="cancelAdd" value="Cancel" 
                                 action="#{patientPaged.cancel()}" immediate="true" />

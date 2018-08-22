@@ -68,6 +68,13 @@ public class PatientCtrl implements Serializable
         logger.debug("loaded "+ patientBean);
     }
 
+    public String saveSelectedPatient(PatientBean patientBean)
+    {
+        logger.info("saveSelectedPatient(arg) " + patientBean);
+        this.patientBean = patientBean;
+        return saveSelectedPatient();
+    }
+
     public String saveSelectedPatient()
     {
         logger.info("saveSelectedPatient " + patientBean);
