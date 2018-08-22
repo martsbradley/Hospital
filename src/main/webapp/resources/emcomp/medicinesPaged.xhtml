@@ -19,23 +19,14 @@
     <composite:implementation>
 
 
-    <e:medicinesPaged medicinePager="#{prescriptionFlowBean.pagedMeds}"/>
-
-
-
     <p:outputPanel style="text-align:center;">
         <div class="form-group row">
             <p:dataTable id="lazyDataTable" value="#{cc.attrs.medicinePager}" 
                          var="medicine" paginator="true" 
                          rows="10" selectionMode="single" 
-                         selection="#{prescriptionFlowBean.selectedMedicine}" 
                          rowKey="#{medicine.id}" lazy="true" rowsPerPageTemplate="5,10,15"
                          paginatorPosition="bottom"
                          paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" >
-
-                         <!--
-               <p:column selectionMode="single" />
-               -->
 
                <p:column sortBy="#{medicine.id}">
                     <f:facet name="header">Id</f:facet>

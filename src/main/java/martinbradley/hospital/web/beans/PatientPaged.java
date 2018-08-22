@@ -55,15 +55,6 @@ public class PatientPaged implements Serializable
         private static final long serialVersionUID = 1L;
         private List<PatientBean> players = Collections.emptyList();
 
-        public PatientLazyList()
-        {   
-            logger.warn("PatientLazyList constructed");
-            logger.debug("See debug -------");
-            logger.info("DebugEnable " +  logger.isDebugEnabled() + 
-                        " InfoEnabled " +  logger.isInfoEnabled() +
-                        " WarnEnabled " +  logger.isWarnEnabled());
-        }
-
         @Override
         public List<PatientBean> load(int startingAt, int maxPerPage, 
                             String sortField, SortOrder sortOrder, Map<String, Object> filters) {
@@ -76,7 +67,6 @@ public class PatientPaged implements Serializable
 
                 logger.info("PatientLazyList loaded " + players.size() + " objects.");
             } catch (Exception e) {
-                e.printStackTrace();
                 logger.info("PatientLazyList error", e);
             }
 

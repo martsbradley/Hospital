@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Set;
 import javax.validation.constraints.*;
 import java.util.List;
+import java.util.ArrayList;
 public class PatientDTO implements Serializable
 {
     private Long id;
@@ -23,7 +24,7 @@ public class PatientDTO implements Serializable
     private static final Logger logger = LoggerFactory.getLogger(PatientDTO.class);
 
     private MessageCollection messages;
-    private List<PrescriptionDTO> prescription;
+    private List<PrescriptionDTO> prescription = new ArrayList();
 
     public List<PrescriptionDTO> getPrescription()
     {
