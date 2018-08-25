@@ -9,18 +9,33 @@ import java.io.Serializable;
 import javax.validation.constraints.*;
 import java.util.List;
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
 
 @Named
 @ViewScoped
+@XmlRootElement(name="patient")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PatientBean implements Serializable
 {
     private Long id;
     @Size(min=1, max=15)
+    @XmlElement
     private String forename;
+
     @Size(min=1, max=20)
+    @XmlElement
     private String surname;
+
+    @XmlElement
     private boolean male;
+
+    @XmlElement
     private LocalDate dob;
+
     private List<PrescriptionBean> prescription = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(PatientBean.class);

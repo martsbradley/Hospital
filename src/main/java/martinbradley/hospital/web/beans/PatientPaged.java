@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ExternalContext;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.SelectEvent;
 import javax.faces.context.FacesContext;
