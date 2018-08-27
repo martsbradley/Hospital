@@ -6,15 +6,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import javax.validation.constraints.*;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Named
 @RequestScoped
+@XmlRootElement(name="prescription")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PrescriptionBean implements Serializable
 {
+    @XmlElement
     private Long id;
+
+    @XmlTransient
     private PatientBean patient;
+
+    @XmlElement
     private LocalDate startDate, endDate;
+
+    @XmlElement
     private String amount;
+
+    @XmlElement
     private MedicineBean medicine;
 
     public Long getId()

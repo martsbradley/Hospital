@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlID;
 
 @Named
 @ViewScoped
@@ -21,7 +22,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PatientBean implements Serializable
 {
+    @XmlElement
     private Long id;
+
     @Size(min=1, max=15)
     @XmlElement
     private String forename;
@@ -36,6 +39,7 @@ public class PatientBean implements Serializable
     @XmlElement
     private LocalDate dob;
 
+    @XmlElement
     private List<PrescriptionBean> prescription = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(PatientBean.class);
