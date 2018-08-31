@@ -19,23 +19,20 @@ public class HospitalResourceImpl
     private static Logger logger = LoggerFactory.getLogger(HospitalResourceImpl.class);
 
     @GET
-    @Path("{id}")
+    @Path("patient/{id}")
     @Produces("application/xml")
     public PatientBean getPatient(@PathParam("id") long patientId)
     {
         logger.info("loading " + patientId);
-        logger.info("patientHandler is null " + (patientHandler == null));
         PatientBean patient = patientHandler.loadById(patientId);
-      //PatientBean p =  new PatientBean();
-      //p.setForename("Martin");
-      //p.setSurname("Bradley");
-
         return patient;
     }
 
+    @Path("patient")
     @POST
-    public long createPatient(PatientBean patientBean)
+    public PatientBean createPatient(PatientBean patientBean)
     {
-        return 0L;
+        logger.info("createPatient passed " + patientBean);
+        return patientBean;
     }
 }

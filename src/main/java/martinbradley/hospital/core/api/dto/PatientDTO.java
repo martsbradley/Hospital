@@ -24,7 +24,7 @@ public class PatientDTO implements Serializable
     private static final Logger logger = LoggerFactory.getLogger(PatientDTO.class);
 
     private MessageCollection messages;
-    private List<PrescriptionDTO> prescription = new ArrayList();
+    private List<PrescriptionDTO> prescription = new ArrayList<>();
 
     public List<PrescriptionDTO> getPrescription()
     {

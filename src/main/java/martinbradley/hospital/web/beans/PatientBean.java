@@ -37,7 +37,7 @@ public class PatientBean implements Serializable
     private boolean male;
 
     @XmlElement
-    private LocalDate dob;
+    private LocalDate dob = LocalDate.now();
 
     @XmlElement
     private List<PrescriptionBean> prescription = new ArrayList<>();
