@@ -77,7 +77,10 @@ public class PatientCtrl implements Serializable
     public String saveSelectedPatient()
     {
         logger.info("saveSelectedPatient " + patientBean);
-        MessageCollection messages = patientHandler.savePatient(patientBean);
+        MessageCollection messages = new MessageCollection();
+        long id = patientHandler.savePatient(patientBean, messages);
+
+        logger.info("Saved Patient and got id " + id);
 
         if (jsfUtil.handleErrors(messages, reportErrors))
         {

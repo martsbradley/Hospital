@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import martinbradley.hospital.core.api.dto.MessageCollection;
 
 @Path("/hospital")
 public class HospitalResourceImpl 
@@ -32,7 +33,11 @@ public class HospitalResourceImpl
     @POST
     public PatientBean createPatient(PatientBean patientBean)
     {
-        logger.info("createPatient passed " + patientBean);
+        logger.warn("createPatient passed " + patientBean);
+
+        MessageCollection messages = new MessageCollection();
+        long id = patientHandler.savePatient(patientBean, messages);
+
         return patientBean;
     }
 }

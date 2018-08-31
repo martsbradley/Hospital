@@ -2,6 +2,7 @@ package martinbradley.hospital.core.api;
 
 import java.util.List;
 import martinbradley.hospital.core.api.dto.PatientDTO;
+import martinbradley.hospital.core.api.dto.MessageCollection;
 
 public interface PatientBroker
 {
@@ -11,7 +12,7 @@ public interface PatientBroker
                                           boolean isAscending);
     public int getPatientCount();
 
-    public PatientDTO savePatient(PatientDTO aPatient);
+    public long savePatient(PatientDTO aPatient, MessageCollection aMessages);
 
     public PatientDTO deletePatient(PatientDTO aPatient);
 

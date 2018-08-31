@@ -121,7 +121,11 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
         prescriptions.add(prescription);
         patient.setPrescription(prescriptions);
 
-        patientHandler.savePatient(patient);
+        MessageCollection messages = new MessageCollection();
+
+        long id = patientHandler.savePatient(patient, messages);
+
+        //TODO handle errors.
 
         return "/patient.xhtml?id="+patientId  +"&faces-redirect=true";
     }

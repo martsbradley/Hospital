@@ -12,9 +12,13 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RestClientTest
 {
+    private static final Logger logger = LoggerFactory.getLogger(RestClientTest.class);
+
     @BeforeEach
     public void beforeEachTest()
     {
@@ -37,13 +41,13 @@ public class RestClientTest
     @Test
     public void callPost()
     {
-       String forename = "martin";
-       String surname = "bradley";
+       String forename = "Frank";
+       String surname = "Spencer";
 
        String xml = String.format(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-                "<patient><id>1</id><forename>%s</forename><surname>%s</surname>" +
-                "<male>true</male></patient>", forename, surname);
+                "<patient><forename>%s</forename><surname>%s</surname>" +
+                "<male>true</male><dob>1976-03-09</dob></patient>", forename, surname);
 
         Client client = ClientBuilder.newClient();
 
@@ -52,6 +56,6 @@ public class RestClientTest
         String response = client.target(url)
                                 .request()
                                 .post(Entity.entity(xml, MediaType.APPLICATION_XML), String.class);
+        logger.info("post response " + response);
     }
-
 }

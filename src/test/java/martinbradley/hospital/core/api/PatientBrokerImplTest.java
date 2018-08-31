@@ -70,8 +70,8 @@ public class PatientBrokerImplTest
             mockRepo.savePatient((Patient)any);
         }};
 
-        Object result = impl.savePatient(patDTO);
-        assertNotNull(result);
+        long patientId = impl.savePatient(patDTO, new MessageCollection());
+        assertThat(patientId, is(not(-1)));
     }
     @Test
     public void deletePatient_CallsRepo()
@@ -97,16 +97,11 @@ public class PatientBrokerImplTest
         patDTO.setDob(LocalDate.now());
         patDTO.setSex("M");
 
-        PatientDTO result = impl.savePatient(patDTO);
-        assertNotNull(result);
+        MessageCollection messages = new MessageCollection();
+        long patientId = impl.savePatient(patDTO, messages);
 
-        MessageCollection errors = result.getMessages();
-        assertNotNull(errors);
-
-        //   TODO
-        //fail("The validation needs coded and this test needs fixed.....");
-        //Set<ConstraintViolation<PatientDTO>> violations = result.getViolations();
-        //assertThat(violations, is(not(empty())));
+        assertThat(patientId, is(-1L));
+        assertThat(messages.hasMessages(), is(true));
     }
 
     @Test

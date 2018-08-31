@@ -14,7 +14,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.XmlID;
+import martinbradley.hospital.jaxb.LocalDateAdapter;
 
 @Named
 @ViewScoped
@@ -37,6 +39,7 @@ public class PatientBean implements Serializable
     private boolean male;
 
     @XmlElement
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     private LocalDate dob = LocalDate.now();
 
     @XmlElement

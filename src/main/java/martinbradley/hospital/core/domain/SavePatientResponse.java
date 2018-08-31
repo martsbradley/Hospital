@@ -15,8 +15,8 @@ public class SavePatientResponse
             throw new NullPointerException();
         }
 
-        this.patient =  patient;
-        this.messages     =  messages;
+        this.patient  =  patient;
+        this.messages =  messages;
     }
 
     public Patient getPatient()

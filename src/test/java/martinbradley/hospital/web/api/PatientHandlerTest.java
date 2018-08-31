@@ -8,6 +8,7 @@ import mockit.*;
 import martinbradley.hospital.web.beans.PatientBean;
 import martinbradley.hospital.core.api.PatientBrokerImpl;
 import martinbradley.hospital.core.api.dto.PatientDTO;
+import martinbradley.hospital.core.api.dto.MessageCollection;
 
 public class PatientHandlerTest
 {
@@ -27,10 +28,11 @@ public class PatientHandlerTest
         PatientBean pat = new PatientBean();
 
         new Expectations(){{
-            patientBroker.savePatient((PatientDTO)any);
+            patientBroker.savePatient((PatientDTO)any, (MessageCollection)any);
         }};
 
-        impl.savePatient(pat);
+        MessageCollection messages = new MessageCollection();
+        impl.savePatient(pat, messages);
     }
     @Test
     public void deletePatient_calls_PatientBroker()

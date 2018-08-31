@@ -60,16 +60,15 @@ public class PatientBrokerImpl implements PatientBroker
     }
 
     @Override
-    public PatientDTO savePatient(PatientDTO aPatientDTO)
+    public long savePatient(PatientDTO aPatientDTO, MessageCollection aMessages)
     {
         logger.info("PatientBrokerImpl.savePatient" + aPatientDTO);
 
-        MessageCollection messages = validatePatient(aPatientDTO);
+        boolean errors = validatePatient(aPatientDTO, aMessages);
 
-        if (messages.hasMessages())
+        if (errors)
         {
-            aPatientDTO.setMessages(messages);
-            return aPatientDTO;
+            return -1;
         }
 
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
@@ -77,29 +76,24 @@ public class PatientBrokerImpl implements PatientBroker
         Patient pat = mapper.dtoToPatient(aPatientDTO);
         logger.info("Converted to the pat " + pat);
 
-
         List<Prescription> pres = pat.getPrescription();
         for (Prescription p : pres)
         {
             p.setPatient(pat);
         }
 
-        SavePatientResponse response = repo.savePatient(pat);
+        SavePatientResponse repoResponse = repo.savePatient(pat);
+        // TODO check for saving errors here.
 
-        PatientDTO savedPatientDTO = mapper.patientToDTO(response.getPatient());
-        savedPatientDTO.setMessages(response.getMessages());
-
-        return savedPatientDTO;
+        return repoResponse.getPatient().getId();
     }
 
-    private MessageCollection validatePatient(PatientDTO aPatientDTO)
+    private boolean validatePatient(PatientDTO aPatientDTO, MessageCollection aMessages)
     {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<PatientDTO>> violations = validator.validate(aPatientDTO);
 
-        MessageCollection messages = new MessageCollection();
-        
         if (!violations.isEmpty())
         {
             ConstraintToMessageConverter conv = new ConstraintToMessageConverter();
@@ -107,10 +101,10 @@ public class PatientBrokerImpl implements PatientBroker
             for (ConstraintViolation<PatientDTO> c : violations)
             {
                 Message message = conv.getMessage(c);
-                messages.add(message);
+                aMessages.add(message);
             }
         }
-        return messages;
+        return aMessages.hasMessages();
     }
 
     public PatientDTO deletePatient(PatientDTO aPatientDTO)

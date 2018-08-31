@@ -47,17 +47,15 @@ public class PatientHandler
         return patientBroker.getPatientCount();
     }
 
-    public MessageCollection savePatient(PatientBean patientBean)
+    public long savePatient(PatientBean patientBean, MessageCollection aMessages)
     {
         logger.info("Save Patient: " + patientBean);
         PatientDTO patient = mapper.beanToDTO(patientBean);
         logger.info("Save PatientDTO: " + patientBean);
 
-        PatientDTO response = patientBroker.savePatient(patient);
-        //logger.info("Save Patient: violations " + violations.size());
-        MessageCollection messages = response.getMessages();
+        long patientId = patientBroker.savePatient(patient, aMessages);
 
-
+        logger.debug("Save Patient: has messages? " + aMessages.hasMessages());
 
         /*
          * Web page has constraints.   These are shown on the webpage
@@ -75,7 +73,7 @@ public class PatientHandler
          * */
 
 
-        return messages;
+        return patientId;
     }
 
     public void deletePatient(PatientBean patientBean)
