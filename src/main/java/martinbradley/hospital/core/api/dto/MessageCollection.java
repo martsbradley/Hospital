@@ -32,4 +32,9 @@ public class MessageCollection implements Iterable<Message>
     public Iterator<Message> iterator() {
         return list.iterator();
     }
+
+    public void addAll(MessageCollection aMessages)
+    {
+        this.list.addAll(aMessages.list);
+    }
 }

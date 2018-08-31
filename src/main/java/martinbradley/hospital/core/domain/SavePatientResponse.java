@@ -28,5 +28,14 @@ public class SavePatientResponse
     {
         return this.messages;
     }
+
+    public boolean hasMessages()
+    {
+        if (messages == null || !messages.hasMessages())
+        {
+            return false;
+        }
+        return true;
+    }
 }
 

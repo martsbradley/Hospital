@@ -29,15 +29,16 @@ public class HospitalResourceImpl
         return patient;
     }
 
-    @Path("patient")
     @POST
-    public PatientBean createPatient(PatientBean patientBean)
+    @Path("patient")
+    public long createPatient(PatientBean patientBean)
     {
         logger.warn("createPatient passed " + patientBean);
 
         MessageCollection messages = new MessageCollection();
         long id = patientHandler.savePatient(patientBean, messages);
 
-        return patientBean;
+
+        return id;
     }
 }

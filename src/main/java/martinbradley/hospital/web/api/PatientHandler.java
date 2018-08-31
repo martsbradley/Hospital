@@ -16,6 +16,7 @@ import martinbradley.hospital.core.api.PatientBroker;
 import martinbradley.hospital.core.api.dto.*;
 import javax.validation.ConstraintViolation;
 import java.util.Set;
+import martinbradley.hospital.web.beans.PageInfo;
 
 @ApplicationScoped
 @Named
@@ -26,14 +27,10 @@ public class PatientHandler
 
     @Inject PatientBroker patientBroker;
 
-    public List<PatientBean> pagePatients(int start, 
-                                          int pageSize,
-                                          String orderColumn,
-                                          boolean isAscending)
+    public List<PatientBean> pagePatients(PageInfo aPageInfo)
     {
-        List<PatientDTO> patients = patientBroker.getPatientsPaged(start, pageSize,
-                                                                    orderColumn,
-                                                                    isAscending);
+        List<PatientDTO> patients = patientBroker.getPatientsPaged(aPageInfo);
+
         ArrayList<PatientBean> beans = new ArrayList<>();
         for (PatientDTO p: patients)
         {

@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Random;
 
 public class RestClientTest
 {
@@ -42,7 +43,7 @@ public class RestClientTest
     public void callPost()
     {
        String forename = "Frank";
-       String surname = "Spencer";
+       String surname = getRandomString();
 
        String xml = String.format(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
@@ -53,9 +54,27 @@ public class RestClientTest
 
         String url = "http://localhost:8080/firstcup/rest/hospital/patient/";
         
-        String response = client.target(url)
+        Long id = client.target(url)
                                 .request()
-                                .post(Entity.entity(xml, MediaType.APPLICATION_XML), String.class);
-        logger.info("post response " + response);
+                                .post(Entity.entity(xml, MediaType.APPLICATION_XML), Long.class);
+        logger.info("post response " + id);
+    }
+
+    private String getRandomString()
+    {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+
+        for (int i = 0; i < targetStringLength; i++) 
+        {
+            int randomLimitedInt = leftLimit + (int) 
+              (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        String generatedString = buffer.toString();
+        return generatedString;
     }
 }

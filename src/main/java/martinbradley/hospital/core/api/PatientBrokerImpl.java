@@ -20,6 +20,7 @@ import java.util.Collections;
 import martinbradley.hospital.core.api.dto.*;
 import org.mapstruct.factory.Mappers;
 import martinbradley.hospital.core.domain.SavePatientResponse;
+import martinbradley.hospital.web.beans.PageInfo;
 
 @Model
 public class PatientBrokerImpl implements PatientBroker
@@ -28,15 +29,15 @@ public class PatientBrokerImpl implements PatientBroker
     private static final Logger logger = LoggerFactory.getLogger(PatientBrokerImpl.class);
 
     @Override
-    public List<PatientDTO> getPatientsPaged(int start,
-                                             int howMany,
-                                             String orderColumn,
-                                             boolean isAscending)
+    public List<PatientDTO> getPatientsPaged(PageInfo aPageInfo)
     {
-        Patient.SortOrder ordering = Patient.SortOrder.find(orderColumn, isAscending);
+        Patient.SortOrder ordering = Patient.SortOrder.find(aPageInfo.getSortField(), 
+                                                            aPageInfo.isAscending());
   
        
-        List<Patient> patients = repo.pagePatients(start, howMany, ordering);
+        List<Patient> patients = repo.pagePatients(aPageInfo.getStartingAt(), 
+                                                   aPageInfo.getMaxPerPage(), 
+                                                   ordering);
 
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
 
@@ -83,8 +84,12 @@ public class PatientBrokerImpl implements PatientBroker
         }
 
         SavePatientResponse repoResponse = repo.savePatient(pat);
-        // TODO check for saving errors here.
-
+        if (repoResponse.hasMessages())
+        {
+            logger.info("Repo hit problems when saving");
+            aMessages.addAll(repoResponse.getMessages());
+            return -1;
+        }
         return repoResponse.getPatient().getId();
     }
 

@@ -28,6 +28,8 @@ import java.util.Set;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.ArrayList;
+import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
+import martinbradley.hospital.web.beans.PageInfo;
 
 public class PatientBrokerImplTest
 {
@@ -53,7 +55,16 @@ public class PatientBrokerImplTest
             mockRepo.pagePatients(1, 10, (Patient.SortOrder)any); result = myResults;
         }};
 
-        List<PatientDTO> list = impl.getPatientsPaged(1, 10, "forename", true);
+        final String sortField = "forename";
+
+        PageInfo pageInfo  = new PageInfoBuilder()
+                                 .setStartAt(1)
+                                 .setMaxPerPage(10)
+                                 .setSortField(sortField)
+                                 .setIsAscending(true)
+                                 .build();
+
+        List<PatientDTO> list = impl.getPatientsPaged(pageInfo);
         assertThat(list, is(not(empty())));
     }
 

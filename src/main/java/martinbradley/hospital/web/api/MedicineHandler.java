@@ -16,7 +16,6 @@ import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import martinbradley.hospital.web.beans.PageInfo;
-import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
 
 @ApplicationScoped
 @Named
@@ -27,9 +26,9 @@ public class MedicineHandler
 
     @Inject MedicineBroker medBroker;
 
-    public List<MedicineBean> pageMedicines(PageInfo pageInfo)
+    public List<MedicineBean> pageMedicines(PageInfo aPageInfo)
     {
-        List<MedicineDTO> list = medBroker.getMedicinesPaged(pageInfo);
+        List<MedicineDTO> list = medBroker.getMedicinesPaged(aPageInfo);
         List<MedicineBean> beans  = convert(list);
 
         return beans;

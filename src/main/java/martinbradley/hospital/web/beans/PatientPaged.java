@@ -23,6 +23,7 @@ import martinbradley.hospital.core.api.dto.Message;
 import javax.faces.component.UIOutput;
 import java.util.ResourceBundle;
 import java.util.Locale;
+import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
 
 @ViewScoped
 @Named
@@ -59,10 +60,17 @@ public class PatientPaged implements Serializable
                             String sortField, SortOrder sortOrder, Map<String, Object> filters) {
             logger.info("Sortfield is " + sortField + " " + sortOrder);
             try {
-                players = patientHandler.pagePatients(startingAt,
-                                                      maxPerPage,
-                                                      sortField, 
-                                                      sortOrder == SortOrder.ASCENDING);
+
+                final String filter = "";
+                PageInfo pageInfo  = new PageInfoBuilder()
+                                         .setStartAt(startingAt)
+                                         .setMaxPerPage(maxPerPage)
+                                         .setSortField(sortField)
+                                         .setIsAscending(sortOrder == SortOrder.ASCENDING)
+                                         .setFilter(filter)
+                                         .build();
+
+                players = patientHandler.pagePatients(pageInfo);
 
                 logger.info("PatientLazyList loaded " + players.size() + " objects.");
             } catch (Exception e) {

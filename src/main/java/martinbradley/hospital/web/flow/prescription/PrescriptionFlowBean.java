@@ -84,7 +84,6 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
      * gotoEndDate
      * gotoSummary
      */
-
     public String gotoStartDate()
     {
         logger.info("gotoStartDate");
@@ -143,7 +142,6 @@ public class PrescriptionFlowBean implements Serializable, LocalDateRange
         MedicineBean med = medLazyList.getRowData(id.toString());
         setSelectedMedicine(med);
     }
-
 
     public String getName() {
         return name;
