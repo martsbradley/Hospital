@@ -127,6 +127,13 @@ public class PatientBrokerImpl implements PatientBroker
     public PatientDTO loadById(long id)
     {
         Patient loadedPatient = repo.loadById(id);
+
+        if (loadedPatient == null)
+        {
+            logger.info("returning null for patient " + id);
+            return null;
+        }
+
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
         PatientDTO dto = mapper.patientToDTO(loadedPatient);
         logger.info(String.format("Loaded(%d) and got %s",id,dto));

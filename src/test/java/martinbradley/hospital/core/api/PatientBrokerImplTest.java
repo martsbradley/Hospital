@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsNot.*;
+import org.hamcrest.core.IsNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import javax.validation.ConstraintViolation;
 import java.util.Set;
@@ -118,21 +120,48 @@ public class PatientBrokerImplTest
     @Test
     public void loadById_calls_resp()
     {
-        final Patient patient = new Patient();
-        patient.setForename("Martin");
-        patient.setSurname("Bradley");
-        patient.setDob(LocalDate.now());
-        patient.setSex(Sex.Male);
-        patient.setPrescription(new ArrayList<Prescription>());
+        final Patient repoPatient = new Patient();
+        repoPatient.setForename("Martin");
+        repoPatient.setSurname("Bradley");
+        repoPatient.setDob(LocalDate.now());
+        repoPatient.setSex(Sex.Male);
+        repoPatient.setPrescription(new ArrayList<Prescription>());
 
+        expectationLoadById(repoPatient);
+
+        PatientDTO result = impl.loadById(1L);
+
+        verifyMockRepoCalledTimes(1);
+
+        assertThat(result, is(not(nullValue())));
+        assertThat(result.getForename(), is("Martin"));
+    }
+
+    @Test
+    public void loadById_not_found()
+    {
+        expectationLoadById(null);
+
+        final Patient patient = null;
+
+        PatientDTO loadedPatient = impl.loadById(1L);
+
+        verifyMockRepoCalledTimes(1);
+
+        assertThat(loadedPatient, is(nullValue()));
+    }
+
+    private void expectationLoadById(Patient patient)
+    {
         new Expectations(){{
-            mockRepo.loadById(anyLong); result= patient;
+            mockRepo.loadById(anyLong); result = patient;
         }};
+    }
 
-        impl.loadById(1L);
-
-        new Verifications(){{
-            mockRepo.loadById(anyLong); times = 1;
+    private void verifyMockRepoCalledTimes(int aTimesCalled)
+    {
+        new Verifications() {{
+            mockRepo.loadById(anyLong); times = aTimesCalled;
         }};
     }
 }
