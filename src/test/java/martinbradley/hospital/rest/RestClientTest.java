@@ -13,6 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import martinbradley.hospital.web.beans.PatientBean;
 import martinbradley.hospital.web.beans.IdentifierBean;
+import javax.ws.rs.core.GenericType;
+import java.util.List;
 
 public class RestClientTest
 {
@@ -24,6 +26,24 @@ public class RestClientTest
         Response response = call_load_patient(1991999);
 
         assertThat(response.getStatusInfo(), is(Response.Status.NOT_FOUND));
+    }
+
+    @Test
+    public void load_patients_paged()
+    {
+        Response resp = call_load_patient_paged(1, 8);
+
+        assertThat(resp.getStatusInfo(), is(Response.Status.ACCEPTED));
+
+        List<PatientBean> patients = resp.readEntity(new GenericType<List<PatientBean>>() { });
+        //
+        //assertThat(patients, is(notN
+
+        System.out.println("patients.size() " +patients.size());
+        for (PatientBean pat : patients)
+        {
+            System.out.println(pat);
+        }
     }
 
     @Test
@@ -84,10 +104,29 @@ public class RestClientTest
 
     private Response call_load_patient(int id)
     {
-        Client client = ClientBuilder.newClient();
-
         String url = String.format("http://localhost:8080/firstcup/rest/hospital/patient/%d",id);
         
+        Response response = callGetRequest(url);
+
+        return response;
+    }
+
+    private Response call_load_patient_paged(int aStart, int aMax)
+    {
+        String url = String.format("http://localhost:8080/firstcup/rest/hospital/patients?" + 
+                                   "start=%d&" +
+                                   "max=%d&sortby=forename", 
+                                   aStart,
+                                   aMax);
+
+        Response response = callGetRequest(url);
+
+        return response;
+    }
+
+    private Response callGetRequest(String url)
+    {
+        Client client = ClientBuilder.newClient();
         Response response = client.target(url)
                                   .request()
                                   .get(Response.class);

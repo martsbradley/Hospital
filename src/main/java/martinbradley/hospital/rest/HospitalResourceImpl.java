@@ -10,11 +10,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.Response.Status;
+import martinbradley.hospital.web.beans.PageInfo;
+import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
+import java.util.List;
+import java.util.ArrayList;
+import javax.ws.rs.core.GenericEntity;
 
 import martinbradley.hospital.core.api.dto.MessageCollection;
 
@@ -40,6 +46,28 @@ public class HospitalResourceImpl
         }
 
         return Response.accepted(patient)
+                       .type(MediaType.APPLICATION_XML)
+                       .build();
+    }
+
+    //"/patient?start=1&max=5?sortby=forname"
+    @GET
+    @Path("patients/")
+    @Produces("application/xml")
+    public Response createPatient(@QueryParam("start")  int aStart,
+                                  @QueryParam("max")    int aMax,
+                                  @QueryParam("sortby") String aSortBy)
+    {
+        PageInfo pageInfo  = new PageInfoBuilder()
+                                 .setStartAt(aStart)
+                                 .setMaxPerPage(aMax)
+                                 .setSortField(aSortBy)
+                                 .build();
+        List<PatientBean> patients = patientHandler.pagePatients(pageInfo);
+
+        GenericEntity<List<PatientBean>> entity = new GenericEntity<List<PatientBean>>(patients) {};
+
+        return Response.accepted(entity)
                        .type(MediaType.APPLICATION_XML)
                        .build();
     }
