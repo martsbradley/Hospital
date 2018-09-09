@@ -32,7 +32,7 @@ public class HospitalResourceImpl
 
     @GET
     @Path("patient/{id}")
-    @Produces("application/xml")
+    @Produces("application/json")
     public Response getPatient(@PathParam("id") long patientId)
     {
         logger.info("loading " + patientId);
@@ -41,19 +41,19 @@ public class HospitalResourceImpl
         if (patient == null)
         {
             return Response.status(Status.NOT_FOUND)
-                           .type(MediaType.APPLICATION_XML)
+                           .type(MediaType.APPLICATION_JSON)
                            .build();
         }
 
         return Response.accepted(patient)
-                       .type(MediaType.APPLICATION_XML)
+                       .type(MediaType.APPLICATION_JSON)
                        .build();
     }
 
     //"/patient?start=1&max=5?sortby=forname"
     @GET
     @Path("patients/")
-    @Produces("application/xml")
+    @Produces("application/json")
     public Response createPatient(@QueryParam("start")  int aStart,
                                   @QueryParam("max")    int aMax,
                                   @QueryParam("sortby") String aSortBy)
@@ -68,13 +68,13 @@ public class HospitalResourceImpl
         GenericEntity<List<PatientBean>> entity = new GenericEntity<List<PatientBean>>(patients) {};
 
         return Response.accepted(entity)
-                       .type(MediaType.APPLICATION_XML)
+                       .type(MediaType.APPLICATION_JSON)
                        .build();
     }
 
     @POST
     @Path("patient")
-    @Produces("application/xml")
+    @Produces("application/json")
     public Response createPatient(PatientBean patientBean)
     {
         logger.warn("createPatient passed " + patientBean);
@@ -87,13 +87,13 @@ public class HospitalResourceImpl
         if (id == null || messages.hasMessages())
         {
             return Response.status(Status.BAD_REQUEST)
-                           .type(MediaType.APPLICATION_XML)
+                           .type(MediaType.APPLICATION_JSON)
                            .entity("Could not get it together")
                            .build();
         }
 
         return Response.accepted(ident)
-                       .type(MediaType.APPLICATION_XML)
+                       .type(MediaType.APPLICATION_JSON)
                        .build();
     }
 }

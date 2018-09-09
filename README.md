@@ -11,13 +11,6 @@ Tasks for the Java-RS Front end.
 5. Create a class that implements that interface.
 6. Write a client that test that class.
 
-Time is now 9.25.
 
-
-1.  Create a package named martinbradley.hospital.rest
-
-2
-
-    
-
-
+TODO
+Optimistic database checking.

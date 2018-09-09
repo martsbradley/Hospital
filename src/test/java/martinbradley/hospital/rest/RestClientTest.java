@@ -49,24 +49,15 @@ public class RestClientTest
     @Test
     public void successful_save_call()
     {
-       String forename = "Frank";
-       String surname = getRandomString();
-
-       String xml = String.format(
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-                "<patient><forename>%s</forename><surname>%s</surname>" +
-                "<male>true</male><dob>1976-03-09</dob></patient>", forename, surname);
-
         PatientBean patientBean =  new PatientBean();
-        patientBean.setForename(forename);
-        patientBean.setSurname(surname);
+        patientBean.setForename("Frank");
+        patientBean.setSurname(getRandomString());
 
         Client client = ClientBuilder.newClient();
 
         String url = "http://localhost:8080/firstcup/rest/hospital/patient/";
         
-        //Entity entity = Entity.entity(xml, MediaType.APPLICATION_XML);
-        Entity entity = Entity.entity(patientBean, MediaType.APPLICATION_XML);
+        Entity entity = Entity.entity(patientBean, MediaType.APPLICATION_JSON);
 
         Response response = client.target(url)
                                   .request()
