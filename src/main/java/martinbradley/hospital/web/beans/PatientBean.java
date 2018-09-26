@@ -49,7 +49,7 @@ public class PatientBean implements Serializable
 
     public PatientBean()
     {
-        logger.info("PatientBean was created");
+        //logger.debug("PatientBean was created");
     }
     public Long getId() {
         return id;

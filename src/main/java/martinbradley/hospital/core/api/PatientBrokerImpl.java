@@ -136,10 +136,10 @@ public class PatientBrokerImpl implements PatientBroker
 
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
         PatientDTO dto = mapper.patientToDTO(loadedPatient);
-        logger.info(String.format("Loaded(%d) and got %s",id,dto));
+        logger.debug(String.format("Loaded(%d) and got %s",id,dto));
         for (PrescriptionDTO p : dto.getPrescription())
         {
-            logger.info("---> A prescription" + p);
+            logger.debug("---> A prescription" + p);
         }
         return dto;
     }

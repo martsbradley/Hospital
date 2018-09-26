@@ -146,7 +146,6 @@ public class PatientDBRepo
                 //aPatient.setPrescription(Collections.emptyList());
             }
 
-            logger.info("save returning " + aPatient.getId());
         }
         catch (Exception e)
         {
@@ -174,6 +173,8 @@ public class PatientDBRepo
                 logger.warn("Failed to commit",e2);
             }
         }
+
+        logger.info("save returning " + aPatient.getId());
         SavePatientResponse resp = new SavePatientResponse(aPatient, new MessageCollection());
         return resp;
     }
@@ -223,11 +224,9 @@ public class PatientDBRepo
             Map<String,Object> hints = new HashMap<>();
             hints.put("javax.persistence.loadgraph", graph);
 
-            logger.info("calling find entityManager.find() with graph" + graph);
-
             pat = entityManager.find(Patient.class, id, hints);
 
-            logger.warn("Got " + pat);
+            logger.debug("loadById " + pat);
             //tx.commit();
         }
       //catch (Exception e)

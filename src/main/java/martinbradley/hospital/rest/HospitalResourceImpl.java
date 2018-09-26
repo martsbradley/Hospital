@@ -35,7 +35,7 @@ public class HospitalResourceImpl
     @Produces("application/json")
     public Response getPatient(@PathParam("id") long patientId)
     {
-        logger.info("loading " + patientId);
+        logger.info("getPatient byId " + patientId);
         PatientBean patient = patientHandler.loadById(patientId);
 
         if (patient == null)
@@ -54,9 +54,9 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/")
     @Produces("application/json")
-    public Response createPatient(@QueryParam("start")  int aStart,
-                                  @QueryParam("max")    int aMax,
-                                  @QueryParam("sortby") String aSortBy)
+    public Response pagePatients(@QueryParam("start")  int aStart,
+                                 @QueryParam("max")    int aMax,
+                                 @QueryParam("sortby") String aSortBy)
     {
         PageInfo pageInfo  = new PageInfoBuilder()
                                  .setStartAt(aStart)
@@ -75,9 +75,9 @@ public class HospitalResourceImpl
     @POST
     @Path("patient")
     @Produces("application/json")
-    public Response createPatient(PatientBean patientBean)
+    public Response savePatient(PatientBean patientBean)
     {
-        logger.warn("createPatient passed " + patientBean);
+        logger.debug("savePatient " + patientBean);
 
         MessageCollection messages = new MessageCollection();
         Long id = patientHandler.savePatient(patientBean, messages);
@@ -86,13 +86,29 @@ public class HospitalResourceImpl
         
         if (id == null || messages.hasMessages())
         {
+            logger.info("Failed to save");
             return Response.status(Status.BAD_REQUEST)
                            .type(MediaType.APPLICATION_JSON)
                            .entity("Could not get it together")
                            .build();
         }
 
+        logger.info("savePatient successful");
+
         return Response.accepted(ident)
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
+    @GET
+    @Path("patients/total")
+    @Produces("application/json")
+    public Response totalPatients()
+    {
+        logger.debug("totalPatients called");
+        int total = patientHandler.getTotalPatients();
+
+        return Response.accepted(total)
                        .type(MediaType.APPLICATION_JSON)
                        .build();
     }

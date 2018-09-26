@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import martinbradley.hospital.jaxb.LocalDateAdapter;
 
 @Named
 @RequestScoped
@@ -26,6 +28,7 @@ public class PrescriptionBean implements Serializable
     private PatientBean patient;
 
     @XmlElement
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     private LocalDate startDate, endDate;
 
     @XmlElement
