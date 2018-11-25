@@ -52,15 +52,14 @@ public class PatientDBRepo
 
     public void deletePatient(Patient aPatient)
     {
-        logger.info("method start");
-        logger.info("deletePatient :" + aPatient);
+        logger.info("Deleting patient ");
+        logger.debug("patient details :" + aPatient);
         try{
             tx.begin();
 
-            logger.info("calling contains");
             if (!entityManager.contains(aPatient))
             {
-                logger.info("calling merge");
+                logger.info("Calling merge");
                 aPatient = entityManager.merge(aPatient);
             }
             Set<Long> tabletIds = new HashSet<>();
@@ -83,7 +82,7 @@ public class PatientDBRepo
 
             aPatient.setPrescription(Collections.emptyList());
 
-            logger.info("calling remove");
+            logger.debug("calling remove");
             entityManager.remove(aPatient);
 
             tx.commit();
@@ -118,7 +117,8 @@ public class PatientDBRepo
     public SavePatientResponse savePatient(Patient aPatient)
     {
         aPatient.setSex(Sex.Male);
-        logger.info("Save called xxxx.:" + aPatient);
+        logger.info("Save called.");
+        logger.debug("For patient :" + aPatient);
 
         try{
             tx.begin();
@@ -136,16 +136,17 @@ public class PatientDBRepo
 
             if (aPatient.getId() == null)
             {
-                logger.info("Calling persist");
+                logger.debug("Calling persist");
                 entityManager.persist(aPatient);
             }
             else
             {
-                logger.info("Calling merge");
+                logger.debug("Calling merge");
                 entityManager.merge(aPatient);
                 //aPatient.setPrescription(Collections.emptyList());
             }
 
+            logger.debug("save finished");
         }
         catch (Exception e)
         {
@@ -174,7 +175,7 @@ public class PatientDBRepo
             }
         }
 
-        logger.info("save returning " + aPatient.getId());
+        logger.info("savePatient returning " + aPatient.getId());
         SavePatientResponse resp = new SavePatientResponse(aPatient, new MessageCollection());
         return resp;
     }

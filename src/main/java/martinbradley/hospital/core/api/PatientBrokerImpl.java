@@ -63,19 +63,19 @@ public class PatientBrokerImpl implements PatientBroker
     @Override
     public long savePatient(PatientDTO aPatientDTO, MessageCollection aMessages)
     {
-        logger.info("PatientBrokerImpl.savePatient" + aPatientDTO);
+        logger.debug("savePatient" + aPatientDTO);
 
         boolean errors = validatePatient(aPatientDTO, aMessages);
 
         if (errors)
         {
+	    logger.warn("savePatient failed.");
             return -1;
         }
 
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
 
         Patient pat = mapper.dtoToPatient(aPatientDTO);
-        logger.info("Converted to the pat " + pat);
 
         List<Prescription> pres = pat.getPrescription();
         for (Prescription p : pres)
@@ -106,15 +106,22 @@ public class PatientBrokerImpl implements PatientBroker
             for (ConstraintViolation<PatientDTO> c : violations)
             {
                 Message message = conv.getMessage(c);
-                aMessages.add(message);
+                if (message == null)
+                {
+                    logger.warn("Cannot find message for " + c);
+                }
+                else
+                {
+                    aMessages.add(message);
+                }
             }
         }
-        return aMessages.hasMessages();
+        return !violations.isEmpty();
     }
 
     public PatientDTO deletePatient(PatientDTO aPatientDTO)
     {
-        logger.info("PatientBrokerImpl.deletePatient" + aPatientDTO);
+        logger.debug("deletePatient" + aPatientDTO);
         final PatientDTOMapper mapper = Mappers.getMapper(PatientDTOMapper.class);
 
         Patient pat = mapper.dtoToPatient(aPatientDTO);

@@ -38,6 +38,7 @@ public class PatientBean implements Serializable
     @XmlElement
     private boolean male;
 
+    @NotNull
     @XmlElement
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     private LocalDate dob = LocalDate.now();

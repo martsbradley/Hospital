@@ -48,7 +48,6 @@ public class PatientHandler
     {
         logger.info("Save Patient: " + patientBean);
         PatientDTO patient = mapper.beanToDTO(patientBean);
-        logger.info("Save PatientDTO: " + patientBean);
 
         long patientId = patientBroker.savePatient(patient, aMessages);
 

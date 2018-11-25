@@ -1,6 +1,9 @@
 package martinbradley.hospital.rest;
 
 import martinbradley.hospital.web.beans.PatientBean;
+import martinbradley.hospital.web.beans.ValidationErrors;
+import martinbradley.hospital.web.beans.ValidationError;
+
 import martinbradley.hospital.web.beans.IdentifierBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +18,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.NotFoundException;
 import static javax.ws.rs.core.Response.Status;
 import martinbradley.hospital.web.beans.PageInfo;
 import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import javax.ws.rs.core.GenericEntity;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import martinbradley.hospital.core.api.dto.MessageCollection;
 
@@ -40,9 +49,10 @@ public class HospitalResourceImpl
 
         if (patient == null)
         {
-            return Response.status(Status.NOT_FOUND)
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+          //return Response.status(Status.NOT_FOUND)
+          //               .type(MediaType.APPLICATION_JSON)
+          //               .build();
+            throw new NotFoundException();
         }
 
         return Response.accepted(patient)
@@ -77,7 +87,18 @@ public class HospitalResourceImpl
     @Produces("application/json")
     public Response savePatient(PatientBean patientBean)
     {
-        logger.debug("savePatient " + patientBean);
+        logger.info("savePatient " + patientBean);
+	ValidationErrors validationResult = validate(patientBean);
+
+	if (validationResult.hasErrors()) {
+	    logger.info("savePatient returning validation message");
+            return Response.status(Status.BAD_REQUEST)
+                           .type(MediaType.APPLICATION_JSON)
+                           //.entity("bla")
+                           .entity(validationResult)
+                           .build();
+	}
+
 
         MessageCollection messages = new MessageCollection();
         Long id = patientHandler.savePatient(patientBean, messages);
@@ -99,6 +120,32 @@ public class HospitalResourceImpl
                        .type(MediaType.APPLICATION_JSON)
                        .build();
     }
+
+    private ValidationErrors validate(PatientBean patientBean) {
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<PatientBean>> violations = validator.validate(patientBean);
+
+	ValidationErrors errors = new ValidationErrors();
+
+	for (ConstraintViolation<PatientBean> violation: violations)
+	{
+	    String invalidValue = (String) violation.getInvalidValue();
+	    String message = violation.getMessage();
+	    String path = violation.getPropertyPath().toString();
+
+	    logger.warn("Found constraint violation. Value: '" + invalidValue + "' Message: " + message);
+	    logger.warn("path." + path);
+
+	    ValidationError error = new ValidationError();
+	    error.setField(path);
+	    error.setMessage(message);
+	    errors.add(error);
+	}
+	return errors;
+    }
+
 
     @GET
     @Path("patients/total")

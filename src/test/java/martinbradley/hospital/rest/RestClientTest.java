@@ -49,7 +49,7 @@ public class RestClientTest
     @Test
     public void successful_save_call()
     {
-        PatientBean patientBean =  new PatientBean();
+        PatientBean patientBean = new PatientBean();
         patientBean.setForename("Frank");
         patientBean.setSurname(getRandomString());
 

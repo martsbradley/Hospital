@@ -87,7 +87,7 @@ public enum ConstraintMessage implements MessageKey
         logConstraint(constraint);
         logger.debug(this.toString());
 
-        logger.info(String.format("matches?\n\troot %s\n\tpath %s\n\ttemplate %s)", 
+        logger.debug(String.format("matches?\n\troot %s\n\tpath %s\n\ttemplate %s)", 
                                                        rootMatches,
                                                        pathMatches,
                                                        templateMatches));
