@@ -24,16 +24,19 @@ import martinbradley.hospital.jaxb.LocalDateAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PatientBean implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     @XmlElement
     private Long id;
+
+    @Size(min=1, max=20)
+    @XmlElement
+    private String surname;
 
     @Size(min=1, max=15)
     @XmlElement
     private String forename;
 
-    @Size(min=1, max=20)
-    @XmlElement
-    private String surname;
 
     @XmlElement
     private boolean male;

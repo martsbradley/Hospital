@@ -24,7 +24,7 @@ public class CheckoutFlow implements Serializable {
     public CheckoutFlow()
     {
         System.out.println("Construct the ... CheckoutFlow");
-        logger.warn("Construct the ... CheckoutFlow");
+        logger.info("Construct the ... CheckoutFlow");
     }
 
     @Produces
@@ -51,7 +51,7 @@ public class CheckoutFlow implements Serializable {
                 "#{checkoutFlowBean.name}").
                 outboundParameter("param2FromCheckoutFlow", 
                 "#{checkoutFlowBean.city}");
-        logger.warn("Returing the flow. CheckoutFlow");
+        logger.info("Returing the flow. CheckoutFlow");
         return flowBuilder.getFlow();
     }
 }

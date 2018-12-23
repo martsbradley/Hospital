@@ -38,4 +38,26 @@
     <welcome-file-list>
         <welcome-file>greeting.xhtml</welcome-file>
     </welcome-file-list>
+
+    <!--
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admins</web-resource-name>
+            <url-pattern>/*</url-pattern> 
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>AdminUsers</role-name>
+        </auth-constraint>
+    </security-constraint>    
+       
+    <security-role>
+        <description>The role that is required to log in to /secure/*</description>
+        <role-name>AdminUsers</role-name>
+    </security-role>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>exampleApplicationDomain</realm-name>
+    </login-config>  -->
 </web-app>

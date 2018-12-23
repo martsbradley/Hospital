@@ -21,6 +21,21 @@ public class PageInfo
     private final boolean isAscending;
     private final String filter;
 
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("PageInfo( start:");
+        sb.append(startingAt);
+        sb.append(" maxPerPage: ");
+        sb.append(maxPerPage);
+        sb.append(" sortField: ");
+        sb.append(sortField);
+        sb.append(" isAscending: ");
+        sb.append(isAscending);
+        sb.append(" filter: ");
+        sb.append(filter);
+        return sb.toString();
+    }
 
     public int getStartingAt()
     {

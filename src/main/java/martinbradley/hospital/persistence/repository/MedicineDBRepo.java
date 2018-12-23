@@ -58,7 +58,10 @@ public class MedicineDBRepo {
                                         Medicine.SortOrder order,
                                         String filter)
     {
-        logger.info("pageMedicines called with " + filter);
+        logger.info("pageMedicines called start "    + start);
+        logger.info("pageMedicines called pageSize " + pageSize);
+        logger.info("pageMedicines called order "    + order);
+        logger.info("pageMedicines called filter "   + filter);
 
         // First create a CriteriaQuery
         // Then convert it to a typed query since that TypedQuery interface has
@@ -108,7 +111,7 @@ public class MedicineDBRepo {
         }
 
         TypedQuery<Long> query  = entityManager.createQuery(criteriaQuery);
-        Long result = (Long) query.getSingleResult();
+        Long result = query.getSingleResult();
 
         return result.intValue();
     }

@@ -23,7 +23,7 @@ public class PrescriptionFlow implements Serializable {
 
     public PrescriptionFlow()
     {
-        logger.warn("Construct the ... PrescriptionFlow");
+        logger.info("Construct the ... PrescriptionFlow");
     }
 
     @Produces
@@ -45,7 +45,7 @@ public class PrescriptionFlow implements Serializable {
 
         flowBuilder.finalizer("#{prescriptionFlowBean.doneFinished()}");
 
-        logger.warn("Returing the flow. prescriptionFlow");
+        logger.info("Returing the flow. prescriptionFlow");
         return flowBuilder.getFlow();
     }
 }

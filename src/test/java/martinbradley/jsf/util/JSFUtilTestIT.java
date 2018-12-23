@@ -20,7 +20,7 @@ import martinbradley.hospital.core.api.dto.MessageCollection;
 import java.util.Locale;
 import javax.faces.context.FacesContext;
 
-public class JSFUtilTest
+public class JSFUtilTestIT
 {
     @Injectable MessageCollection messages;
     @Injectable UIOutput reportErrors;

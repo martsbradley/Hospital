@@ -1,21 +1,21 @@
 -- Patients;
-insert into patient (forename,surname,sex,dateofbirth)
-values ('Martin', 'Riggs', 'Male', '2011-01-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('Martin', 'Riggs', 'Male', '2011-01-01',0); 
 
-insert into patient (forename,surname,sex,dateofbirth)
-values ('Lisa', 'Burnett', 'Male', '2013-01-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('Lisa', 'Burnett', 'Male', '2013-01-01',0); 
 
-insert into patient (forename,surname,sex,dateofbirth)
-values ('Joan', 'O\'Arch', 'Female', '1980-11-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('Joan', 'OArch', 'Female', '1980-11-01',0); 
 
-insert into patient (forename,surname,sex,dateofbirth)
-values ('Michael', 'Corleone', 'Male', '1945-12-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('Michael', 'Corleone', 'Male', '1945-12-01',0); 
 
-insert into patient (forename,surname,sex,dateofbirth)
-values ('James', 'Dean', 'Male', '1938-12-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('James', 'Dean', 'Male', '1938-12-01',0); 
 
-insert into patient (forename,surname,sex,dateofbirth)
-values ('Karen', 'Carter', 'Male', '1979-12-01'); 
+insert into patient (forename,surname,sex,dateofbirth,version)
+values ('Karen', 'Carter', 'Male', '1979-12-01',0); 
 -- Medicines.
 
 

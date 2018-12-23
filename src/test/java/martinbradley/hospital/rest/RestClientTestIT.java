@@ -16,9 +16,9 @@ import martinbradley.hospital.web.beans.IdentifierBean;
 import javax.ws.rs.core.GenericType;
 import java.util.List;
 
-public class RestClientTest
+public class RestClientTestIT
 {
-    private static final Logger logger = LoggerFactory.getLogger(RestClientTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestClientTestIT.class);
 
     @Test
     public void patient_load_not_found_404()

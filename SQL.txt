@@ -7,7 +7,8 @@ id SERIAL PRIMARY KEY,
 forename varchar(20) NOT NULL,
 surname varchar(50) NOT NULL,
 sex varchar(6) CHECK (sex IN ('Male','Female')) NOT NULL,
-dateofbirth timestamp NOT NULL
+dateofbirth timestamp NOT NULL,
+version integer NOT NULL
 );
 
 create table medicine (
