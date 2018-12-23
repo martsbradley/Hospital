@@ -85,7 +85,9 @@ public class TestDatabase
         sb.append( "forename varchar(20) NOT NULL,                            ");
         sb.append( "surname varchar(50) NOT NULL,                             ");
         sb.append( "sex varchar(6) CHECK (sex IN ('Male','Female')) NOT NULL, ");
-        sb.append( "dateofbirth date NOT NULL)                                "); 
+        sb.append( "dateofbirth date NOT NULL,                                "); 
+        sb.append( "version integer NOT NULL)                                 "); 
+
         String query = sb.toString();
 
         runStatement(conn, query);

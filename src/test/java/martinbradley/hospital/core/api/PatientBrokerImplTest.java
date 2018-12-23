@@ -45,10 +45,8 @@ public class PatientBrokerImplTest
         impl.repo = mockRepo;
     }
 
-
     @Test
-    public void getPatients_CallsRepo()
-    {
+    public void getPatients_CallsRepo() {
         Patient p1 = new Patient();
         Patient p2 = new Patient();
         final List<Patient> myResults = Arrays.asList(p1,p2);
@@ -71,13 +69,13 @@ public class PatientBrokerImplTest
     }
 
     @Test
-    public void savePatient_CallsRepo()
-    {
+    public void savePatient_CallsRepo() {
         PatientDTO patDTO = new PatientDTO();
         patDTO.setForename("Martin");
         patDTO.setSurname("Bradley");
         patDTO.setDob(LocalDate.now());
         patDTO.setSex("M");
+        patDTO.setRowVersion(0);
 
         new Expectations(){{
             mockRepo.savePatient((Patient)any);

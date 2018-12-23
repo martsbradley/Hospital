@@ -21,6 +21,10 @@ public class PatientDTO implements Serializable
 
     @NotNull
     private LocalDate dob;
+
+    @NotNull
+    private Integer rowVersion;
+
     private static final Logger logger = LoggerFactory.getLogger(PatientDTO.class);
 
     private MessageCollection messages;
@@ -80,6 +84,14 @@ public class PatientDTO implements Serializable
     {
         this.sex = sex;
     }
+
+    public void setRowVersion(Integer rowVersion) {
+        this.rowVersion = rowVersion;
+    }
+    public Integer getRowVersion() {
+        return this.rowVersion;
+    }
+
     @Override
     public String toString()
     {

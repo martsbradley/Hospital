@@ -37,7 +37,6 @@ public class PatientBean implements Serializable
     @XmlElement
     private String forename;
 
-
     @XmlElement
     private boolean male;
 
@@ -45,6 +44,10 @@ public class PatientBean implements Serializable
     @XmlElement
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     private LocalDate dob = LocalDate.now();
+
+    @NotNull
+    @XmlElement
+    private Integer rowVersion;
 
     @XmlElement
     private List<PrescriptionBean> prescription = new ArrayList<>();
@@ -115,5 +118,12 @@ public class PatientBean implements Serializable
     {
 	logger.info("addPatient(" + patient + ")");
         return "greeting";
+    }
+
+    public void setRowVersion(Integer rowVersion) {
+        this.rowVersion = rowVersion;
+    }
+    public Integer getRowVersion() {
+        return this.rowVersion;
     }
 }

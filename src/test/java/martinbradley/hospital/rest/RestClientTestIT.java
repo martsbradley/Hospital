@@ -15,6 +15,7 @@ import martinbradley.hospital.web.beans.PatientBean;
 import martinbradley.hospital.web.beans.IdentifierBean;
 import javax.ws.rs.core.GenericType;
 import java.util.List;
+import java.time.LocalDate;
 
 public class RestClientTestIT
 {
@@ -23,6 +24,7 @@ public class RestClientTestIT
     @Test
     public void patient_load_not_found_404()
     {
+        logger.info("*************Starting patient_load_not_found_404 **************");
         Response response = call_load_patient(1991999);
 
         assertThat(response.getStatusInfo(), is(Response.Status.NOT_FOUND));
@@ -31,6 +33,7 @@ public class RestClientTestIT
     @Test
     public void load_patients_paged()
     {
+        logger.info("*************Starting load_patients_paged **************");
         Response resp = call_load_patient_paged(1, 8);
 
         assertThat(resp.getStatusInfo(), is(Response.Status.ACCEPTED));
@@ -49,9 +52,13 @@ public class RestClientTestIT
     @Test
     public void successful_save_call()
     {
+        logger.info("starting successful_save_call test");
         PatientBean patientBean = new PatientBean();
+        patientBean.setId(null);
         patientBean.setForename("Frank");
         patientBean.setSurname(getRandomString());
+        patientBean.setDob(LocalDate.now());
+        patientBean.setRowVersion(2);
 
         Client client = ClientBuilder.newClient();
 

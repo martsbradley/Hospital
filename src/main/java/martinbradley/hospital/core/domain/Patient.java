@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Version;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -51,6 +52,10 @@ public class Patient
 
     @Column(name="dateofbirth")
     private LocalDate dob;
+
+    @Column(name="version")
+    @Version
+    private Integer rowVersion;
 
     public Long getId() {
         return id;
@@ -169,5 +174,11 @@ public class Patient
             }
            throw new RuntimeException("SortOrder::find null for '" + name + "'");
         }
+    }
+    public void setRowVersion(Integer rowVersion) {
+        this.rowVersion = rowVersion;
+    }
+    public Integer getRowVersion() {
+        return this.rowVersion;
     }
 }
