@@ -84,6 +84,7 @@ public class PatientBrokerImpl implements PatientBroker
         }
 
         SavePatientResponse repoResponse = repo.savePatient(pat);
+        logger.info("repoResponse hasMessages?" + repoResponse.hasMessages());
         if (repoResponse.hasMessages())
         {
             logger.info("Repo hit problems when saving");

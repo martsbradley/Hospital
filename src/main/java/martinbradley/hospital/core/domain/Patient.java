@@ -114,6 +114,8 @@ public class Patient
         sb.append(surname);
         sb.append(",");
         sb.append(dob);
+        sb.append(" version");
+        sb.append(rowVersion);
         sb.append("]");
 
         sb.append("Prescriptions\n[\n");

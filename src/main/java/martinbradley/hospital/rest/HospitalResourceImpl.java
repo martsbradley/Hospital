@@ -144,10 +144,10 @@ public class HospitalResourceImpl
         
         if (id == null || messages.hasMessages())
         {
-            logger.info("Failed to save");
+            logger.info("Failed to save" + messages);
             return Response.status(Status.BAD_REQUEST)
                            .type(MediaType.APPLICATION_JSON)
-                           .entity("Could not get it together")
+                           .entity(messages.toString())
                            .build();
         }
 

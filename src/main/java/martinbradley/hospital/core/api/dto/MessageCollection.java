@@ -13,9 +13,11 @@ public class MessageCollection implements Iterable<Message>
     public MessageCollection()
     {
     }
-    public void add(Message message)
-    {
-        if (message == null) throw new NullPointerException("");
+
+    public void add(Message message) {
+        if (message == null) {
+            throw new NullPointerException("");
+        }
 
         list.add(message);
     }
@@ -36,5 +38,16 @@ public class MessageCollection implements Iterable<Message>
     public void addAll(MessageCollection aMessages)
     {
         this.list.addAll(aMessages.list);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Message message : list) {
+            sb.append("Message :");
+            sb.append(message);
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }

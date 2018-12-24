@@ -51,7 +51,7 @@ public class PatientHandler
 
         long patientId = patientBroker.savePatient(patient, aMessages);
 
-        logger.debug("Save Patient: has messages? " + aMessages.hasMessages());
+        logger.info("Save Patient: has messages? " + aMessages.hasMessages());
 
         /*
          * Web page has constraints.   These are shown on the webpage

@@ -5,7 +5,8 @@ import martinbradley.hospital.core.message.MessageKey;
 
 public enum MessageKeyImpl implements MessageKey
 {
-    PATIENT_NAME_DUPLICATE("PatientNameDuplicate");
+    PATIENT_NAME_DUPLICATE("PatientNameDuplicate"),
+    OPTIMISTIC_LOCK_EXCEPTION("OptimisticLockException");
 
     private final String propertyPath;
 

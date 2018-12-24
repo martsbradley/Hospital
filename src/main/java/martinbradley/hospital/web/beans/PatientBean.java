@@ -109,10 +109,13 @@ public class PatientBean implements Serializable
     @Override
     public String toString()
     {
+        String version = this.rowVersion == null? "null": this.rowVersion.toString();
+
         return "Patient [" + id + ", " 
                            + forename + " " 
                            + surname +   " " 
-                           + dob + "]";
+                           + dob + " " 
+                           + version + "]";
     }
     public String addPatient(PatientBean patient)
     {

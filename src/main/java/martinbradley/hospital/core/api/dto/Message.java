@@ -26,4 +26,20 @@ public class Message
     {
         return message.getKey();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" MessageKey ");
+        sb.append(message);
+
+        for (String arg : args) {
+            sb.append("Arg :");
+            sb.append(arg);
+            sb.append(": ");
+        }
+        return sb.toString();
+    }
+
 }

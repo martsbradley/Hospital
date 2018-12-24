@@ -21,6 +21,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
+import javax.transaction.Status;
+import javax.persistence.FlushModeType;
 import javax.persistence.EntityTransaction;
 import martinbradley.hospital.core.api.dto.*;
 import martinbradley.hospital.core.message.MessageKeyImpl;
@@ -28,6 +30,7 @@ import martinbradley.hospital.core.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.persistence.EntityGraph;
+import javax.persistence.OptimisticLockException;
 
 
 @Model
@@ -39,6 +42,7 @@ public class PatientDBRepo
 
     @Resource
     UserTransaction tx;
+
     private static final Logger logger = LoggerFactory.getLogger(PatientDBRepo.class);
 
     public void setEntityManager(EntityManager entityManager)
@@ -85,11 +89,12 @@ public class PatientDBRepo
             logger.debug("calling remove");
             entityManager.remove(aPatient);
 
-            tx.commit();
             logger.info("committed");
+            tx.commit();
         }
         catch (Exception e)
         {
+            rollbackTransaction();
             logger.warn("error " + e.getMessage());
         }
     }
@@ -114,17 +119,38 @@ public class PatientDBRepo
         return duplicate;
     }
 
+    private String getTransactionStatusString() throws Exception {
+
+        switch (tx.getStatus()) {
+            case Status.STATUS_ACTIVE:           return "Status.STATUS_ACTIVE";   
+            case Status.STATUS_COMMITTED:        return "Status.STATUS_COMMITTED";   
+            case Status.STATUS_COMMITTING:       return "Status.STATUS_COMMITTING";   
+            case Status.STATUS_MARKED_ROLLBACK:  return "Status.STATUS_MARKED_ROLLBACK";   
+            case Status.STATUS_NO_TRANSACTION:   return "Status.STATUS_NO_TRANSACTION";   
+            case Status.STATUS_PREPARED:         return "Status.STATUS_PREPARED";   
+            case Status.STATUS_PREPARING:        return "Status.STATUS_PREPARING";   
+            case Status.STATUS_ROLLEDBACK:       return "Status.STATUS_ROLLEDBACK";   
+            case Status.STATUS_ROLLING_BACK:     return "Status.STATUS_ROLLING_BACK";   
+            case Status.STATUS_UNKNOWN:          return "Status.STATUS_UNKNOWN";   
+            default: return "Status Unknown";
+      } 
+    }
+
     public SavePatientResponse savePatient(Patient aPatient)
     {
         aPatient.setSex(Sex.Male);
-        logger.info("Save called.");
-        logger.debug("For patient :" + aPatient);
+        logger.info("\n\n\n\n\nSave patient :" + aPatient);
+        logger.info("Transacion is " + tx);
+        logger.info("entityManager is " + entityManager);
+        FlushModeType flushMode =  entityManager.getFlushMode();
+        logger.info("FlushModeType is " + flushMode);
 
         try{
+            logger.warn("Tx status is " + getTransactionStatusString());
             tx.begin();
+            logger.warn("After begin Tx status is " + getTransactionStatusString());
 
-            if (duplicatePatientCheck(aPatient))
-            {
+            if (duplicatePatientCheck(aPatient)) {
                 logger.info("This patient already exists!");
                 MessageCollection msg = new MessageCollection();
                 msg.add(new Message(MessageKeyImpl.PATIENT_NAME_DUPLICATE));
@@ -132,53 +158,60 @@ public class PatientDBRepo
                 SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
                 return resp;
             }
+
             logger.info("Patient not a duplicate");
 
-            if (aPatient.getId() == null)
-            {
-                logger.debug("Calling persist");
-                entityManager.persist(aPatient);
-            }
-            else
-            {
-                logger.debug("Calling merge");
-                entityManager.merge(aPatient);
+       ///  if (aPatient.getId() == null) {
+       ///      logger.info("Calling persist");
+       ///      entityManager.persist(aPatient);
+       ///  }
+       ///  else {
+                logger.info("Calling merge");
+                aPatient = entityManager.merge(aPatient);
                 //aPatient.setPrescription(Collections.emptyList());
-            }
+       //   }
 
-            logger.debug("save finished");
+            logger.info("save finished");
+            entityManager.flush();
+            tx.commit();
+            logger.warn("After commit tx status is " + getTransactionStatusString());
         }
-        catch (Exception e)
-        {
+        catch (OptimisticLockException e) {
+            logger.warn("OptimisticLockException " + e.getMessage());
+
+            MessageCollection msg = new MessageCollection();
+            msg.add(new Message(MessageKeyImpl.OPTIMISTIC_LOCK_EXCEPTION));
+
+            SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
+
+            rollbackTransaction();
+            return resp;
+        }
+        catch (Exception e) {
             logger.warn("Error saving Patient " + e.getClass().getName());
 
-            try{
-                tx.rollback();
-                tx = null;
-            }
-            catch (Exception e2)
-            {
-                logger.warn("Failed to rollback",e2);
-            }
-        }
-        finally
-        {
-            try{
-                if (tx != null)
-                {
-                    tx.commit();
-                }
-            }
-            catch (Exception e2)
-            {
-                logger.warn("Failed to commit",e2);
-            }
+            rollbackTransaction();
+
+            MessageCollection msg = new MessageCollection();
+            msg.add(new Message(MessageKeyImpl.OPTIMISTIC_LOCK_EXCEPTION));// fix me here!!!
+
+            SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
         }
 
         logger.info("savePatient returning " + aPatient.getId());
         SavePatientResponse resp = new SavePatientResponse(aPatient, new MessageCollection());
         return resp;
     }
+
+    private void rollbackTransaction() {
+        try{
+            tx.rollback();
+        }
+        catch (Exception e) {
+            logger.warn("Failed to rollback",e);
+        }
+    }
+
 
     public List<Patient> pagePatients(int start, int pageSize,
                                       Patient.SortOrder order)

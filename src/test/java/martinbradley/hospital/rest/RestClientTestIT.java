@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import martinbradley.hospital.web.beans.PatientBean;
 import martinbradley.hospital.web.beans.IdentifierBean;
 import javax.ws.rs.core.GenericType;
@@ -50,8 +51,7 @@ public class RestClientTestIT
     }
 
     @Test
-    public void successful_save_call()
-    {
+    public void successful_save_call() {
         logger.info("starting successful_save_call test");
         PatientBean patientBean = new PatientBean();
         patientBean.setId(null);
@@ -60,18 +60,11 @@ public class RestClientTestIT
         patientBean.setDob(LocalDate.now());
         patientBean.setRowVersion(2);
 
-        Client client = ClientBuilder.newClient();
 
-        String url = "http://localhost:8080/firstcup/rest/hospital/patient/";
-        
-        Entity entity = Entity.entity(patientBean, MediaType.APPLICATION_JSON);
-
-        Response response = client.target(url)
-                                  .request()
-                                  .post(entity, Response.class);
-
+        Response response = callSavePatientEndpoint(patientBean);
 
         assertThat(response.getStatusInfo(), is(Response.Status.ACCEPTED));
+
         logger.info("post response " + response);
 
         IdentifierBean idBean = response.readEntity(IdentifierBean.class);
@@ -79,9 +72,44 @@ public class RestClientTestIT
         logger.info("Save returned id " + idBean.getId());
     }
 
+    /** Load up the same object twice
+     *  save updated version of the first one.
+     *  Then try to save the second one with a change and it not allow it*/
+    @Test
+    public void test_optimistic_locking() {
 
-    private String getRandomString()
-    {
+        for (int x = 0; x < 10; x++) {
+            tryOptimistic();
+        }
+    }
+    private void tryOptimistic(){
+        Response response = call_load_patient(1);
+        PatientBean patientOne = response.readEntity(PatientBean.class);
+        logger.info("Loaded patientOne version "+ patientOne.getRowVersion() + " " +
+                                                  patientOne.getSurname());
+
+        Response anotherResponse = call_load_patient(1);
+        PatientBean anotherPatientOne = anotherResponse.readEntity(PatientBean.class);
+        logger.info("Loaded anotherResponse version "+ anotherPatientOne.getRowVersion()+ " " + 
+                                                       anotherPatientOne.getSurname());
+
+        assertThat(patientOne, not(anotherPatientOne));
+
+        String name = getRandomString();
+        logger.info("Changing PatientOne to name "+ name);
+        patientOne.setSurname(name);
+        response = callSavePatientEndpoint(patientOne);
+
+        assertThat(response.getStatusInfo(), is(Response.Status.ACCEPTED));
+
+        name = getRandomString();
+        logger.info("Changing anotherPatientOne to name " + name);
+        anotherPatientOne.setSurname(name);
+        response = callSavePatientEndpoint(anotherPatientOne);
+        assertThat(response.getStatusInfo(), is(Response.Status.BAD_REQUEST));
+    }
+
+    private String getRandomString() {
         int leftLimit = 97; // letter 'a'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 10;
@@ -128,6 +156,19 @@ public class RestClientTestIT
         Response response = client.target(url)
                                   .request()
                                   .get(Response.class);
+        return response;
+    }
+
+    private Response callSavePatientEndpoint(PatientBean patientBean) {
+        
+        Client client = ClientBuilder.newClient();
+
+        Entity entity = Entity.entity(patientBean, MediaType.APPLICATION_JSON);
+
+        String url = "http://localhost:8080/firstcup/rest/hospital/patient/";
+        Response response = client.target(url)
+                                  .request()
+                                  .post(entity, Response.class);
         return response;
     }
 }
