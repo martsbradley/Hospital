@@ -30,17 +30,45 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
+
+    <filter>
+        <filter-name>RestAuthenticationFilter</filter-name>
+        <filter-class>martinbradley.hospital.web.RestAuthenticationFilter</filter-class>
+        <description>Performs pre-login and post-login operation</description>
+        <init-param>
+            <param-name>RevokedUsers</param-name>
+            <param-value>c:\WebSphere\AppServer\installedApps\revokedUsers.lst</param-value>
+        </init-param>
+    </filter>
+    <filter>
+        <filter-name>TestFilter</filter-name>
+        <filter-class>martinbradley.hospital.web.TestFilter</filter-class>
+        <description>Performs pre-login and post-login operation</description>
+        <init-param>
+            <param-name>RevokedUsers</param-name>
+            <param-value>c:\WebSphere\AppServer\installedApps\revokedUsers.lst</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>RestAuthenticationFilter</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>TestFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
+
     <welcome-file-list>
         <welcome-file>greeting.xhtml</welcome-file>
     </welcome-file-list>
 
     <!--
-
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Admins</web-resource-name>

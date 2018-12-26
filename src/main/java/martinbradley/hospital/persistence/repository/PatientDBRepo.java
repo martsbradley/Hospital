@@ -161,15 +161,14 @@ public class PatientDBRepo
 
             logger.info("Patient not a duplicate");
 
-       ///  if (aPatient.getId() == null) {
-       ///      logger.info("Calling persist");
-       ///      entityManager.persist(aPatient);
-       ///  }
-       ///  else {
+            if (aPatient.getId() == null) {
+                logger.info("Calling persist");
+                entityManager.persist(aPatient);
+            }
+            else {
                 logger.info("Calling merge");
-                aPatient = entityManager.merge(aPatient);
-                //aPatient.setPrescription(Collections.emptyList());
-       //   }
+                entityManager.merge(aPatient);
+            }
 
             logger.info("save finished");
             entityManager.flush();
