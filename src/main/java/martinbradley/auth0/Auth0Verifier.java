@@ -32,7 +32,7 @@ public class Auth0Verifier {
             logger.warn("Decoded successfully");
             return true;
         } catch (JWTVerificationException exception){
-            logger.warn("Hit a problem, ", exception);
+            logger.warn("JWT Not valid : "+ exception.getMessage());
         }
         return false;
     }

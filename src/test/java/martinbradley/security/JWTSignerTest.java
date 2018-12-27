@@ -11,62 +11,106 @@ import java.util.StringJoiner;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class JWTSignerTest {
     private static final Logger logger = LoggerFactory.getLogger(JWTSigner.class);
-    @Test
-    public void call() throws Exception {
-        logger.info("JWTSignerTest starting");
-        JWTSigner signer = new JWTSigner();
+    final KeyPair keyPair;
+    final String issuer = "https://myeducation.eu.auth0.com/";
 
-        String issuer = "https://myeducation.eu.auth0.com/";
 
-        String header  = new Joiner().create("alg","RS256", 
-                                             "typ", "JWT");
-
-        String payload = new Joiner().create("sub","1234567890",
-                                             "name", "Martin Bradley",
-                                             "iss", issuer,
-                                             "iat", new Integer(1516239022));
-        String jwt = signer.doit(header, payload);
-
-        logger.info("header is  "+ header);
-        logger.info("payload is  "+ payload);
-
-        logger.info("Result is "+ jwt);
-
-        RSASigner rsa = new RSASigner();
-
-        KeyPair pair = rsa.getKeyPair();
-        RSAPublicKey pub = (RSAPublicKey)pair.getPublic();
-
-        Auth0Verifier auth = new Auth0Verifier(issuer, pub);
-        boolean isvalid = auth.isTokenValid(jwt);
+    JWTSignerTest() throws Exception {
+        keyPair = new RSASigner().getKeyPair();
     }
 
-    private static class Joiner {
-        StringJoiner joiner = new StringJoiner(",", "{", "}");
+    private String createJWT(String issuer, 
+                                  long iat,
+                                  long exp)
+        throws Exception {
+        Object[] header = {"alg","RS256", 
+                           "typ", "JWT"};
 
-        public String create(Object ... args) {
+        Object[] payload = {"sub","1234567890",
+                            "name", "Martin Bradley",
+                            "iss", issuer,
+                            "iat", new Long(iat),
+                            "exp", new Long(exp)}; 
 
-            Iterator<Object> it = Arrays.asList(args).iterator();
+        JWTSigner signer = new JWTSigner(keyPair);
+        signer.setHeader(header);
+        signer.setPayload(payload);
 
-            while (it.hasNext()) {
-                String key = (String)it.next();
-                Object value = it.next();
+        String jwt = signer.createSignedJWT();
+        return jwt;
+    }
+    private long toSinceEpoch(LocalDateTime time) {
+        return time.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
 
-                String item = getJWTSource(key, value);
-                joiner.add(item);
-            }
-            return joiner.toString();
-        }
+    private String createValidJWT() 
+        throws Exception {
 
-        private String getJWTSource(String key, Object value) {
-            if (value instanceof String)
-                return String.format("\"%s\":\"%s\"", key,value);
-            else
-                return String.format("\"%s\":%d", key, value);
-        }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime hourBefore = now.minusHours(1);
+        LocalDateTime hourAfter  = now.plusHours(1);
+
+        long issuedAt = toSinceEpoch(hourBefore);
+        long expires  = toSinceEpoch(hourAfter);
+        System.out.println("Issued at " + issuedAt);
+
+        return createJWT(issuer, issuedAt, expires);
+    }
+
+    private String createExpiredJWT() 
+        throws Exception {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime hourBefore = now.minusHours(100);
+        LocalDateTime hourAfter  = now.minusHours(1);// finished one hour ago!
+
+        long issuedAt = toSinceEpoch(hourBefore);
+        long expires  = toSinceEpoch(hourAfter);
+        System.out.println("Issued at " + issuedAt);
+
+        return createJWT(issuer, issuedAt, expires);
+    }
+
+    @Test
+    public void testValidJwt() throws Exception {
+        String validJWT = createValidJWT();
+
+
+        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
+
+        Auth0Verifier auth = new Auth0Verifier(issuer, pub);
+        boolean isValid = auth.isTokenValid(validJWT);
+        assertThat(isValid, is(true));
+    }
+
+    @Test
+    public void testExpiredJwt() throws Exception {
+        String validJWT = createExpiredJWT();
+
+
+        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
+
+        Auth0Verifier auth = new Auth0Verifier(issuer, pub);
+        boolean isValid = auth.isTokenValid(validJWT);
+        assertThat(isValid, is(false));
+    }
+    @Test
+    public void testWrongIssuerJwt() throws Exception {
+        String validJWT = createValidJWT();
+
+        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
+        String otherIssuer = "SomeOtherIssuer";
+
+        Auth0Verifier auth = new Auth0Verifier(otherIssuer, pub);
+        boolean isValid = auth.isTokenValid(validJWT);
+        assertThat(isValid, is(false));
     }
 }

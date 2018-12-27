@@ -8,17 +8,39 @@ import static java.util.Base64.Decoder;
 import java.security.KeyPair;
 import java.security.Signature;
 import java.security.NoSuchAlgorithmException;
+import java.util.StringJoiner;
+import java.util.Iterator;
+import java.util.Arrays;
 
     //data = base64urlEncode( header ) + “.” + base64urlEncode( payload
 public class JWTSigner {
 
     private static final Logger logger = LoggerFactory.getLogger(JWTSigner.class);
+    private final KeyPair keyPair;
+    private String unencodedHeader = "";
+    private String unencodedPayload = "";
 
-    public String doit(String header, String payload) 
+    public JWTSigner(KeyPair keyPair) {
+        this.keyPair = keyPair;
+    }
+
+    public void setHeader(Object ... header) {
+        Joiner joiner = new Joiner();
+        unencodedHeader = joiner.create(header);
+    }
+    public void setPayload(Object ... payload) {
+        Joiner joiner = new Joiner();
+        unencodedPayload = joiner.create(payload);
+    }
+
+    public String createSignedJWT() 
         throws Exception {
+        logger.info("header is  "+ unencodedHeader);
+        logger.info("payload is  "+ unencodedPayload);
 
-        String encodedHeader  = encode(header);
-        String encodedPayload = encode(payload);
+
+        String encodedHeader  = encode(unencodedHeader);
+        String encodedPayload = encode(unencodedPayload);
 
         System.out.println("encodedHeader " + encodedHeader);
         System.out.println("encodedPayload " + encodedPayload);
@@ -26,18 +48,16 @@ public class JWTSigner {
         String toBeSigned = encodedHeader + "." + encodedPayload;
         String signature = signIt(toBeSigned);
         String jwt = toBeSigned + "." + signature;
+        logger.debug("Result is "+ jwt);
         return jwt;
     }
 
     private String signIt(String aToBeSigned) 
         throws Exception {
         try {
-            RSASigner rsa = new RSASigner();
-            KeyPair pair = rsa.getKeyPair();
-
             Signature signer = Signature.getInstance("SHA256withRSA");
 
-            signer.initSign(pair.getPrivate());
+            signer.initSign(this.keyPair.getPrivate());
             signer.update(aToBeSigned.getBytes());
             byte[] signedBytes = signer.sign();
 
@@ -65,4 +85,28 @@ public class JWTSigner {
         return output;
     }
 
+    private static class Joiner {
+        StringJoiner joiner = new StringJoiner(",", "{", "}");
+
+        public String create(Object ... args) {
+
+            Iterator<Object> it = Arrays.asList(args).iterator();
+
+            while (it.hasNext()) {
+                String key = (String)it.next();
+                Object value = it.next();
+
+                String item = getJWTSource(key, value);
+                joiner.add(item);
+            }
+            return joiner.toString();
+        }
+
+        private String getJWTSource(String key, Object value) {
+            if (value instanceof String)
+                return String.format("\"%s\":\"%s\"", key,value);
+            else
+                return String.format("\"%s\":%d", key, value);
+        }
+    }
 }
