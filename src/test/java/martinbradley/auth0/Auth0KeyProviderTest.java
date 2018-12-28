@@ -10,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.auth0.jwk.SigningKeyNotFoundException;
+import com.auth0.jwk.JwkException;
 
 public class Auth0KeyProviderTest {
     private static Logger logger = LoggerFactory.getLogger(Auth0KeyProviderTest.class);
@@ -20,31 +21,37 @@ public class Auth0KeyProviderTest {
         String url = "https://myeducation.eu.auth0.com";
         String key  = "RjZDMzYyQTBBMzMxRTAyODIzOEIxRjBCRUNBMzE4M0ZGNTE0MTNGQQ";
 
-        Auth0KeyProvider provider = new Auth0KeyProvider(url, key);
+        Auth0KeyProvider provider = new Auth0KeyProvider(url);
         PublicKey publicKey = provider.getPublicKey(key);
 
         assertThat(publicKey, is(notNullValue()));
     }
-    @Test
-    public void unknownKeyAtConstruction() {
-        assertThrows(SigningKeyNotFoundException.class,
-                () -> {
-            String url = "https://myeducation.eu.auth0.com";
-            String key  = "unknown";
 
-            Auth0KeyProvider provider = new Auth0KeyProvider(url, key);
-        });
-    }
     @Test
     public void unknownKeyAfterConstruction() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(JwkException.class,
                 () -> {
             String url = "https://myeducation.eu.auth0.com";
             String key  = "RjZDMzYyQTBBMzMxRTAyODIzOEIxRjBCRUNBMzE4M0ZGNTE0MTNGQQ";
 
-            Auth0KeyProvider provider = new Auth0KeyProvider(url, key);
+            Auth0KeyProvider provider = new Auth0KeyProvider(url);
             String unknownKey  = "unknown";
             provider.getPublicKey(unknownKey);
         });
+    }
+    @Test
+    public void keyNull() 
+        throws Exception {
+      //assertThrows(JwkException.class,
+      //        () -> {
+            String url = "https://myeducation.eu.auth0.com";
+            String key  = "RjZDMzYyQTBBMzMxRTAyODIzOEIxRjBCRUNBMzE4M0ZGNTE0MTNGQQ";
+
+            Auth0KeyProvider provider = new Auth0KeyProvider(url);
+            String nullKey  = null;
+            Object x = provider.getPublicKey(nullKey);
+            assertThat(x, is(notNullValue()));
+            System.out.println(x);
+      //});
     }
 }

@@ -17,29 +17,24 @@ import com.auth0.jwk.JwkException;
 public class Auth0KeyProvider {
     private static Logger logger = LoggerFactory.getLogger(Auth0KeyProvider.class);
     
-    public final PublicKey publicKey;
-    public final String initialKey;
+    public final JwkProvider provider;
     
-    public Auth0KeyProvider(String myURL, String keyId) 
+    public Auth0KeyProvider(String myURL) 
         throws JwkException {
 
-        JwkProvider provider = 
-            new JwkProviderBuilder(myURL)
+        provider = new JwkProviderBuilder(myURL)
                                   .cached(10, 24,     TimeUnit.HOURS)
                                   .rateLimited(10, 1, TimeUnit.MINUTES)
                                   .build();
-        Jwk jwk = provider.get(keyId);
-
-
-        this.initialKey = keyId;
-        this.publicKey = jwk.getPublicKey();
     }
     
-    public PublicKey getPublicKey(String keyId) {
-        if (!initialKey.equals(keyId) ||
-             publicKey == null) {
+    public PublicKey getPublicKey(String keyId) 
+        throws JwkException {
+        if (provider == null) {
             throw new IllegalStateException("Why is there no key");
         }
-        return publicKey;
+
+        Jwk jwk = provider.get(keyId);
+        return jwk.getPublicKey();
     }
 }

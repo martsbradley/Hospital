@@ -36,8 +36,12 @@
         <filter-class>martinbradley.hospital.web.RestAuthenticationFilter</filter-class>
         <description>Performs pre-login and post-login operation</description>
         <init-param>
-            <param-name>RevokedUsers</param-name>
-            <param-value>c:\WebSphere\AppServer\installedApps\revokedUsers.lst</param-value>
+            <param-name>AUTH0_URL</param-name>
+            <param-value>https://myeducation.eu.auth0.com</param-value>
+        </init-param>
+        <init-param>
+            <param-name>AUTH0_ISSUER</param-name>
+            <param-value>https://myeducation.eu.auth0.com/</param-value>
         </init-param>
     </filter>
     <filter>
