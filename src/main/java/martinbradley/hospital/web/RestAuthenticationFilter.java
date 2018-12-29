@@ -7,8 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.HttpHeaders;
 import javax.servlet.http.HttpFilter;
-import martsbradley.auth0.Auth0Verifier;
-import martinbradley.auth0.Auth0KeyProvider;
+import martinbradley.auth0.Auth0RSASolution;
 import com.auth0.jwk.JwkException;
 import java.security.interfaces.RSAPublicKey;
 
@@ -23,7 +22,7 @@ public class RestAuthenticationFilter extends HttpFilter {
 
     private String auth0URL = "";
     private String auth0Issuer = "";
-    private Auth0Verifier auth0Verifier;
+    private Auth0RSASolution auth0;
 
     public void init(FilterConfig filterConfig) 
         throws ServletException {
@@ -45,17 +44,15 @@ public class RestAuthenticationFilter extends HttpFilter {
 
     private void initAuth0Verifier()
         throws ServletException{
-        if (auth0Verifier == null) {
-            logger.info("Creating Auth0Verifier");
+        if (auth0 == null) {
+            logger.info("Creating Auth0");
 
             try {
-                Auth0KeyProvider provider = new Auth0KeyProvider(auth0URL);
-
-                auth0Verifier = new Auth0Verifier(auth0Issuer, 
-                                                  (RSAPublicKey)provider.getPublicKey(null));
+                auth0 = new Auth0RSASolution(auth0URL,
+                                             auth0Issuer);
             }
             catch (JwkException  e) {
-                logger.warn("Problem creating Auth0Verifier :", e);
+                logger.warn("Problem creating Auth0 :", e);
                 throw new ServletException(e);
             }
         }
@@ -94,8 +91,12 @@ public class RestAuthenticationFilter extends HttpFilter {
     }
 
     private boolean isBearerTokenValid(final String aBearerToken){
-        boolean isValid = auth0Verifier.isTokenValid(aBearerToken);
+        logger.warn("checking isBearerTokenValid");
+        boolean isValid = auth0.isTokenValid(aBearerToken);
         return isValid;
-        //return "123".equals(aBearerToken);
     }
+
+  //public void setAuth0RSASolution(Auth0RSASolution auth0) {
+  //    this.auth0 = auth0;
+  //}
 }

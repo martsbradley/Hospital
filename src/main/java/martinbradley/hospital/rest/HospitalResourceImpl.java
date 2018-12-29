@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.annotation.security.RolesAllowed;
 
 import martinbradley.hospital.core.api.dto.MessageCollection;
+import martinbradley.auth0.SecuredRestfulMethod;
 
 @Path("/hospital")
 public class HospitalResourceImpl 
@@ -47,9 +48,11 @@ public class HospitalResourceImpl
     @Inject MedicineHandler medicineHandler;
     private static Logger logger = LoggerFactory.getLogger(HospitalResourceImpl.class);
 
+
     @GET
     @Path("patient/{id}")
     @Produces("application/json")
+    @SecuredRestfulMethod
     public Response getPatient(@PathParam("id") long patientId)
     {
         logger.info("getPatient byId " + patientId);
@@ -72,6 +75,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/")
     @Produces("application/json")
+    @SecuredRestfulMethod
     public Response pagePatients(@QueryParam("start")  int aStart,
                                  @QueryParam("max")    int aMax,
                                  @QueryParam("sortby") String aSortBy)
@@ -188,6 +192,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/total")
     @Produces("application/json")
+    @SecuredRestfulMethod
     public Response totalPatients()
     {
         logger.debug("totalPatients called");

@@ -12,12 +12,18 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import javax.ws.rs.core.HttpHeaders;
+import martinbradley.auth0.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 public class RestAuthenticationFilterTest {
     RestAuthenticationFilter impl = new RestAuthenticationFilter();
     @Mocked HttpServletRequest  request;
     @Mocked HttpServletResponse response;
     @Mocked FilterChain chain;
+    @Mocked FilterConfig filterConfig;
+
+    @Mocked Auth0RSASolution auth0;
 
     @BeforeEach
     public void setMeUp() {
@@ -42,8 +48,15 @@ public class RestAuthenticationFilterTest {
         throws IOException, ServletException {
 
         expectBearerToken("123");
+
         expectThatChainIsCalled();
 
+        new Expectations(){{
+            auth0.isTokenValid((String)any);
+            result = true;
+        }};
+
+        impl.init(filterConfig);
         impl.doFilter(request, response, chain);
     }
 }

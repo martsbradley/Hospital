@@ -31,6 +31,7 @@
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
 
+    <!--
     <filter>
         <filter-name>RestAuthenticationFilter</filter-name>
         <filter-class>martinbradley.hospital.web.RestAuthenticationFilter</filter-class>
@@ -63,6 +64,7 @@
         <filter-name>TestFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
 
     <session-config>
         <session-timeout>30</session-timeout>

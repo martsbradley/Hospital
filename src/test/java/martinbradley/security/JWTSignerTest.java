@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 
-import martsbradley.auth0.Auth0Verifier;
+import martinbradley.auth0.Auth0Verifier;
 import java.util.StringJoiner;
 import java.util.Iterator;
 import java.util.ArrayList;

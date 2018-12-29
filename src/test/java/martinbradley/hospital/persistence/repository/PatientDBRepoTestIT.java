@@ -17,7 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.not;
 import javax.persistence.EntityTransaction;
 
-public class PatientDBRepoTest
+public class PatientDBRepoTestIT
 {
     @Injectable EntityManager entityManager;
     @Injectable UserTransaction tx;

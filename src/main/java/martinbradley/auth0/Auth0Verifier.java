@@ -1,4 +1,4 @@
-package martsbradley.auth0;
+package martinbradley.auth0;
 
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -9,17 +9,19 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.security.PublicKey;
 
 public class Auth0Verifier {
     private final JWTVerifier verifier;
     private static Logger logger = LoggerFactory.getLogger(Auth0Verifier.class);
 
     public Auth0Verifier(String aIssuer,
-                         RSAPublicKey aPublicKey) {
+                         PublicKey aPublicKey) {
 
         RSAPrivateKey privateKey = null;// Not needed, here we only verify tokens.
 
-        final Algorithm algorithm = Algorithm.RSA256(aPublicKey, privateKey);
+        final Algorithm algorithm = Algorithm.RSA256((RSAPublicKey)aPublicKey, 
+                                                     privateKey);
 
         verifier = JWT.require(algorithm)
                       .withIssuer(aIssuer)

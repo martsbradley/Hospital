@@ -40,9 +40,9 @@ import static org.hamcrest.core.Is.is;
 import org.hamcrest.core.IsCollectionContaining;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TestDatabase
+public class DatabaseTestIT
 {
-    private static final Logger log = LoggerFactory.getLogger(TestDatabase.class);
+    private static final Logger log = LoggerFactory.getLogger(DatabaseTestIT.class);
     private static String protocol     = "jdbc:derby:"; 
     private static String driver       = "org.apache.derby.jdbc.EmbeddedDriver"; 
     private static String databaseName = "myDerbyDB;create=true"; 
