@@ -21,6 +21,15 @@
         <param-value>true</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>AUTH0_URL</param-name>
+        <param-value>https://myeducation.eu.auth0.com</param-value>
+    </context-param>
+    <context-param>
+        <param-name>AUTH0_ISSUER</param-name>
+        <param-value>https://myeducation.eu.auth0.com/</param-value>
+    </context-param>
+
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>

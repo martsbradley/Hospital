@@ -10,6 +10,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
+import com.auth0.jwk.JwkException;
 
 @SecuredRestfulMethod
 @Provider
@@ -19,38 +22,55 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private static Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
     private static final String REALM = "example";
     private static final String AUTHENTICATION_SCHEME = "Bearer";
+    private Auth0RSASolution auth0;
+    private final String AUTH0_URL    = "AUTH0_URL";
+    private final String AUTH0_ISSUER = "AUTH0_ISSUER";
+
+    @Context
+    public void setServletContext(ServletContext aContext) 
+        throws JwkException {
+        String auth0URL    = aContext.getInitParameter(AUTH0_URL);
+        String auth0Issuer = aContext.getInitParameter(AUTH0_ISSUER);
+        logger.warn("auth0URL    : " + auth0URL);
+        logger.warn("auth0Issuer : " + auth0Issuer);
+        auth0 = new Auth0RSASolution(auth0URL, auth0Issuer);
+    }
+
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
-        logger.info("Filter called");
-        // Get the Authorization header from the request
         String authorizationHeader =
                 requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        // Validate the Authorization header
         if (!isTokenBasedAuthentication(authorizationHeader)) {
             logger.warn("No token cannot authorize");
             abortWithUnauthorized(requestContext);
             return;
         }
 
-        // Extract the token from the Authorization header
         String token = authorizationHeader
                             .substring(AUTHENTICATION_SCHEME.length()).trim();
-
-        logger.warn("Received token" + token);
-
-
         try {
-
-            // Validate the token
             validateToken(token);
 
         } catch (Exception e) {
+            logger.warn("Abort with UNAUTHORIZED", e.getMessage());
             abortWithUnauthorized(requestContext);
         }
         logger.warn("Request AUTHORIZED");
+    }
+
+
+    private void abortWithUnauthorized(ContainerRequestContext requestContext) {
+
+        // Abort the filter chain with a 401 status code response
+        // The WWW-Authenticate header is sent along with the response
+        requestContext.abortWith(
+                Response.status(Response.Status.UNAUTHORIZED)
+                        .header(HttpHeaders.WWW_AUTHENTICATE, 
+                                AUTHENTICATION_SCHEME + " realm=\"" + REALM + "\"")
+                        .build());
     }
 
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
@@ -62,21 +82,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                     .startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ");
     }
 
-    private void abortWithUnauthorized(ContainerRequestContext requestContext) {
-
-        // Abort the filter chain with a 401 status code response
-        // The WWW-Authenticate header is sent along with the response
-        logger.warn("Abort with UNAUTHORIZED");
-        requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED)
-                        .header(HttpHeaders.WWW_AUTHENTICATE, 
-                                AUTHENTICATION_SCHEME + " realm=\"" + REALM + "\"")
-                        .build());
-    }
-
     private void validateToken(String token) throws Exception {
-        // Check if the token was issued by the server and if it's not expired
-        // Throw an Exception if the token is invalid
-        logger.warn("Validate token");
+        boolean isValid =  auth0.isTokenValid(token);
+        logger.warn("Validated token as :" + isValid);
     }
 }
