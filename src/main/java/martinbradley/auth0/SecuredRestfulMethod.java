@@ -12,4 +12,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @NameBinding
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
-public @interface SecuredRestfulMethod { }
+public @interface SecuredRestfulMethod { 
+    String[] scopes() default {};
+}

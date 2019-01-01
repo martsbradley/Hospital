@@ -52,7 +52,6 @@ public class HospitalResourceImpl
     @GET
     @Path("patient/{id}")
     @Produces("application/json")
-    @SecuredRestfulMethod
     public Response getPatient(@PathParam("id") long patientId)
     {
         logger.info("getPatient byId " + patientId);
@@ -75,7 +74,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/")
     @Produces("application/json")
-    @SecuredRestfulMethod
+    @SecuredRestfulMethod(scopes={"read:patients"})
     public Response pagePatients(@QueryParam("start")  int aStart,
                                  @QueryParam("max")    int aMax,
                                  @QueryParam("sortby") String aSortBy)
@@ -192,7 +191,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/total")
     @Produces("application/json")
-    @SecuredRestfulMethod
+    @SecuredRestfulMethod(scopes={"read:patients"})
     public Response totalPatients()
     {
         logger.debug("totalPatients called");

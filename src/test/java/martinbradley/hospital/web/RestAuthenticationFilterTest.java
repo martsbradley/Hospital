@@ -52,7 +52,7 @@ public class RestAuthenticationFilterTest {
         expectThatChainIsCalled();
 
         new Expectations(){{
-            auth0.isTokenValid((String)any);
+            auth0.canTokenAccess((String)any, new String[0]);
             result = true;
         }};
 

@@ -92,7 +92,7 @@ public class RestAuthenticationFilter extends HttpFilter {
 
     private boolean isBearerTokenValid(final String aBearerToken){
         logger.warn("checking isBearerTokenValid");
-        boolean isValid = auth0.isTokenValid(aBearerToken);
+        boolean isValid = auth0.canTokenAccess(aBearerToken, new String[0]);
         return isValid;
     }
 

@@ -13,6 +13,8 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import com.auth0.jwk.JwkException;
+import javax.ws.rs.container.ResourceInfo;
+import java.lang.reflect.Method;
 
 @SecuredRestfulMethod
 @Provider
@@ -25,6 +27,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private Auth0RSASolution auth0;
     private final String AUTH0_URL    = "AUTH0_URL";
     private final String AUTH0_ISSUER = "AUTH0_ISSUER";
+    @Context private ResourceInfo resourceInfo;
 
     @Context
     public void setServletContext(ServletContext aContext) 
@@ -36,7 +39,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         auth0 = new Auth0RSASolution(auth0URL, auth0Issuer);
     }
 
-
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
@@ -44,7 +46,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         if (!isTokenBasedAuthentication(authorizationHeader)) {
-            logger.warn("No token cannot authorize");
+            logger.warn("JWT token missing.");
             abortWithUnauthorized(requestContext);
             return;
         }
@@ -52,18 +54,20 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         String token = authorizationHeader
                             .substring(AUTHENTICATION_SCHEME.length()).trim();
         try {
-            validateToken(token);
+            if (validateToken(token) == false) {
+                abortWithUnauthorized(requestContext);
+            }
 
         } catch (Exception e) {
-            logger.warn("Abort with UNAUTHORIZED", e.getMessage());
+            logger.warn("Token invalid : ", e.getMessage());
             abortWithUnauthorized(requestContext);
         }
         logger.warn("Request AUTHORIZED");
     }
 
-
     private void abortWithUnauthorized(ContainerRequestContext requestContext) {
 
+        logger.warn("Aborting with UNAUTHORIZED");
         // Abort the filter chain with a 401 status code response
         // The WWW-Authenticate header is sent along with the response
         requestContext.abortWith(
@@ -82,8 +86,19 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                     .startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ");
     }
 
-    private void validateToken(String token) throws Exception {
-        boolean isValid =  auth0.isTokenValid(token);
+    private boolean validateToken(String token) throws Exception {
+
+        Method method = resourceInfo.getResourceMethod();
+        String[] scopes = new String [0];
+
+        if (method != null) {
+            SecuredRestfulMethod secured = method.getAnnotation(SecuredRestfulMethod.class);
+            scopes =  secured.scopes();  
+            logger.warn("annotation scope is: " + scopes);  
+        }
+
+        boolean isValid =  auth0.canTokenAccess(token, scopes);
         logger.warn("Validated token as :" + isValid);
+        return isValid;
     }
 }

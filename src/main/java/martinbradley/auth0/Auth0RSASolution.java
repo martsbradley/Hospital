@@ -31,8 +31,8 @@ public class Auth0RSASolution {
                                      provider.getPublicKey(null)); 
     }
 
-    public boolean isTokenValid(String token) {
-        boolean isTokenValid = verifier.isTokenValid(token);
+    public boolean canTokenAccess(String token, String... scopes) {
+        boolean isTokenValid = verifier.validTokenHasScopes(token, scopes);
         return isTokenValid;
     }
 }
