@@ -13,5 +13,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 public @interface SecuredRestfulMethod { 
-    String[] scopes() default {};
+    String[] groups() default {};
 }

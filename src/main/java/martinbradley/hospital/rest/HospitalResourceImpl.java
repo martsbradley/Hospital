@@ -35,7 +35,6 @@ import javax.validation.ValidatorFactory;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
 import javax.servlet.http.HttpServletRequest;
-import javax.annotation.security.RolesAllowed;
 
 import martinbradley.hospital.core.api.dto.MessageCollection;
 import martinbradley.auth0.SecuredRestfulMethod;
@@ -74,7 +73,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/")
     @Produces("application/json")
-    @SecuredRestfulMethod(scopes={"read:patients"})
+    @SecuredRestfulMethod(groups={"read:patients"})
     public Response pagePatients(@QueryParam("start")  int aStart,
                                  @QueryParam("max")    int aMax,
                                  @QueryParam("sortby") String aSortBy)
@@ -191,7 +190,7 @@ public class HospitalResourceImpl
     @GET
     @Path("patients/total")
     @Produces("application/json")
-    @SecuredRestfulMethod(scopes={"read:patients"})
+    @SecuredRestfulMethod(groups={"read:patients"})
     public Response totalPatients()
     {
         logger.debug("totalPatients called");
@@ -249,7 +248,6 @@ public class HospitalResourceImpl
 
     @POST
     @Path("logOff")
-    @RolesAllowed({ ADMIN_ROLE})
     @Produces("application/text")
     public Response isAdmin(@Context HttpServletRequest req) {
 

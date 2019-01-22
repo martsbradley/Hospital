@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import com.auth0.jwk.JwkException;
 import javax.ws.rs.container.ResourceInfo;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 @SecuredRestfulMethod
 @Provider
@@ -24,10 +25,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private static Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
     private static final String REALM = "example";
     private static final String AUTHENTICATION_SCHEME = "Bearer";
-    private Auth0RSASolution auth0;
+    private Auth0RSASolution auth0RSA;
     private final String AUTH0_URL    = "AUTH0_URL";
     private final String AUTH0_ISSUER = "AUTH0_ISSUER";
-    @Context private ResourceInfo resourceInfo;
+    @Context ResourceInfo resourceInfo;
 
     @Context
     public void setServletContext(ServletContext aContext) 
@@ -36,11 +37,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         String auth0Issuer = aContext.getInitParameter(AUTH0_ISSUER);
         logger.warn("auth0URL    : " + auth0URL);
         logger.warn("auth0Issuer : " + auth0Issuer);
-        auth0 = new Auth0RSASolution(auth0URL, auth0Issuer);
+        auth0RSA = new Auth0RSASolution(auth0URL, auth0Issuer);
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext)
+        throws IOException {
 
         String authorizationHeader =
                 requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -52,7 +54,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         }
 
         String token = authorizationHeader
-                            .substring(AUTHENTICATION_SCHEME.length()).trim();
+                            .substring(AUTHENTICATION_SCHEME.length())
+                            .trim();
         try {
             if (validateToken(token) == false) {
                 abortWithUnauthorized(requestContext);
@@ -87,17 +90,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     private boolean validateToken(String token) throws Exception {
+        SecuredRestfulMethodHelper helper = new
+                                        SecuredRestfulMethodHelper();
 
-        Method method = resourceInfo.getResourceMethod();
-        String[] scopes = new String [0];
+        String[] groups = helper.getGroups(resourceInfo);
 
-        if (method != null) {
-            SecuredRestfulMethod secured = method.getAnnotation(SecuredRestfulMethod.class);
-            scopes =  secured.scopes();  
-            logger.warn("annotation scope is: " + scopes);  
-        }
 
-        boolean isValid =  auth0.canTokenAccess(token, scopes);
+        logger.warn("auth0RSA is null? " + (auth0RSA == null));
+
+        boolean isValid = auth0RSA.canTokenAccess(token, groups);
+
         logger.warn("Validated token as :" + isValid);
         return isValid;
     }
