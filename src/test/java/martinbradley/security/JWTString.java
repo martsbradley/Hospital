@@ -1,6 +1,6 @@
-package martsbradley.security;
+package martinbradley.security;
 
-class JWTString {
+public class JWTString {
     private final String issuer;
     private final long iat;
     private final long exp;

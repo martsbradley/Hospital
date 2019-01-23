@@ -1,4 +1,4 @@
-package martsbradley.security;
+package martinbradley.auth0;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +17,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import martinbradley.security.JWTString;
+import martinbradley.security.JWTSigner;
+import martinbradley.security.RSASigner;
 
-public class JWTSignerTest {
+public class Auth0VerifierTest {
     private static final Logger logger = LoggerFactory.getLogger(JWTSigner.class);
     final KeyPair keyPair;
     final String issuer = "https://myeducation.eu.auth0.com/";
     JWTString.Builder builder;
 
-    JWTSignerTest() throws Exception {
+    Auth0VerifierTest() throws Exception {
         keyPair = new RSASigner().getKeyPair();
     }
 
