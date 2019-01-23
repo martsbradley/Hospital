@@ -1,19 +1,21 @@
 package martinbradley.security;
+import java.util.StringJoiner;
+import java.util.Arrays;
 
 public class JWTString {
     private final String issuer;
     private final long iat;
     private final long exp;
     private final String scope;
+    private final String namespace, groups;  
 
-    private JWTString(String aIssuer,
-                      long aIat,
-                      long aExp,
-                      String aScope) {
-        issuer = aIssuer;
-        iat    = aIat;
-        exp    = aExp;
-        scope  = aScope;
+    private JWTString(Builder aBuilder) {
+        issuer    = aBuilder.issuer;
+        iat       = aBuilder.iat;
+        exp       = aBuilder.exp;
+        scope     = aBuilder.scope;
+        namespace = aBuilder.namespace;
+        groups    = aBuilder.groups;
     }
 
     public Object[] getHeader() {
@@ -28,6 +30,13 @@ public class JWTString {
                             "scope", scope,
                             "iat", new Long(iat),
                             "exp", new Long(exp)}; 
+
+        if (namespace != null && groups != null) {
+            Object larger[] = Arrays.copyOf(payload, payload.length+2);
+            larger[larger.length-2] = namespace;
+            larger[larger.length-1] = "groups: [" + groups + "]";
+            payload = larger;
+        }
         return payload;
     }
 
@@ -36,6 +45,8 @@ public class JWTString {
         long iat;
         long exp;
         String scope;
+        String namespace;
+        String groups;
 
         public Builder setIssuer(String aIssuer) {
             this.issuer = aIssuer;
@@ -53,8 +64,17 @@ public class JWTString {
             this.scope = aScope;
             return this;
         }
+        public Builder setGroups(String namespace, String ... groups) {
+            this.namespace = namespace;
+            StringJoiner joiner = new StringJoiner(",");
+            for (String group: groups) {
+                joiner.add(group);
+            }
+            this.groups = joiner.toString();
+            return this;
+        }
         public JWTString build(){
-            return new JWTString(issuer, iat, exp, scope);
+            return new JWTString(this);
         }
     }
 }

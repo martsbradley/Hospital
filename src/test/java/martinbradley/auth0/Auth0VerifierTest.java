@@ -95,13 +95,18 @@ public class Auth0VerifierTest {
         return time.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
+    private Auth0Verifier createVerifier() {
+        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
+
+        Auth0Verifier auth = new Auth0Verifier(issuer, pub);
+        return auth;
+    }
+
     @Test
     public void testExpiredJwt() throws Exception {
         String validJWT = createExpiredJWT();
 
-        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
-
-        Auth0Verifier auth = new Auth0Verifier(issuer, pub);
+        Auth0Verifier auth = createVerifier();
         boolean isValid = auth.validTokenHasScopes(validJWT, "read:patients");
         assertThat(isValid, is(false));
     }
@@ -112,6 +117,62 @@ public class Auth0VerifierTest {
 
         validate(otherIssuer, false, "read:patients");
     }
+
+    @Test
+    public void tokenIsValid() throws Exception {
+        String validJWT = createValidJWT();
+
+        Auth0Verifier auth = createVerifier();
+
+        boolean isValid = auth.tokenIsValid(validJWT);
+        assertThat(isValid, is(true));
+    }
+    @Test
+    public void tokenIsNotValid() throws Exception {
+        String invalidJWT = "This not a valid token";
+
+        Auth0Verifier auth = createVerifier();
+
+        boolean isValid = auth.tokenIsValid(invalidJWT);
+        assertThat(isValid, is(false));
+    }
+
+    @Test
+    public void validAccessRequest() throws Exception {
+
+        builder.setGroups("namespace", "admin");
+
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+        boolean isValid = auth.isValidAccessRequest(validJWT, "namespace", "admin");
+        assertThat(isValid, is(true));
+    }
+
+    @Test
+    public void inValidAccessRequest() throws Exception {
+
+        builder.setGroups("namespace", "non-admin");
+
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+        boolean isValid = auth.isValidAccessRequest(validJWT, "namespace", "admin");
+        assertThat(isValid, is(false));
+    }
+    @Test
+    public void groupsSetIncorreclty() throws Exception {
+
+        builder.setGroups("namespace", "normal");
+
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+                                                    // Missing the groups on the request
+        boolean isValid = auth.isValidAccessRequest(validJWT, "namespace");
+        assertThat(isValid, is(false));
+    }
+
 
     @Test
     public void testJwtBlankScope() throws Exception {

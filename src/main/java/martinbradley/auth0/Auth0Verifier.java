@@ -34,6 +34,104 @@ public class Auth0Verifier {
                       .build(); 
     }
 
+    public boolean tokenIsValid(String token) {
+        
+        DecodedJWT result = getToken(token);
+        return result != null;
+    }
+    /*
+     *
+  {
+  "https://gorticrum.com/user_authorization": {
+    "groups": [
+      "adminGroup"
+    ]
+  },
+  "iss": "https://myeducation.eu.auth0.com/",
+  "sub": "auth0|5c1d5347b171c1019044870e",
+  "aud": [
+    "http://localhost:8080/firstcup/hospital/rest",
+    "https://myeducation.eu.auth0.com/userinfo"
+  ],
+  "iat": 1548274059,
+  "exp": 1a548277659,
+  "azp": "eoK8GT2cFHcYWIbdGy-7qm9Wx5sanGkh",
+  "scope": "openid profile email read:patients"
+}
+*/
+    private Set<String> allowedGroups(DecodedJWT aJwt,
+                                      String aNamespace) {
+        Map<String, Claim> claims = aJwt.getClaims();
+
+        Set<String> allowedGroups = new HashSet<>();
+
+        if (claims.containsKey(aNamespace)) {
+            Claim groupsClaim = claims.get(aNamespace);
+            String includedGroups = groupsClaim.asString();
+            logger.warn("includedGroups '" + includedGroups + "'");
+
+            int startIdx = includedGroups.indexOf("[");
+            int endIdx = includedGroups.indexOf("]");
+            includedGroups = includedGroups.substring(startIdx+1, endIdx);
+
+            logger.warn("includedGroups '" + includedGroups + "'");
+
+            String[] allowedGroupsArr = includedGroups.split(",");
+
+            for (String allowedGroup: allowedGroupsArr) {
+                allowedGroups.add(allowedGroup);
+            }
+        }
+        return allowedGroups;
+    }
+
+    public boolean isValidAccessRequest(String token, 
+                                        String namespace,
+                                        String ... aRequiredGroups) {
+        DecodedJWT jwt = getToken(token);
+
+        if (jwt == null ) {
+            logger.warn("jwt is null");
+            return false;
+        }
+
+        if (aRequiredGroups.length == 0) {
+            logger.warn("Need to specify groups when using security");
+            return false;
+        }
+
+        Set<String> allowedGroups = allowedGroups(jwt, namespace);
+
+
+        Set<String> requiredGroups = new HashSet<>(
+                                           Arrays.asList(aRequiredGroups));
+        for (String group: allowedGroups) {
+            logger.debug("Allowed group name '" +group + "'");
+        }
+
+        for (String group: requiredGroups) {
+            logger.debug("Required group name '" +group + "'");
+        }
+
+        boolean isValid = allowedGroups.containsAll(requiredGroups);
+
+        logger.info("isValidAccessRequest returning " + isValid);
+        if (!isValid) {
+            logger.warn("Authorization failed for " + token);
+        }
+        return isValid;
+    }
+
+    private DecodedJWT getToken(String token) {
+        DecodedJWT jwt = null;
+        try {
+            jwt = verifier.verify(token);
+        } catch (JWTVerificationException exception){
+            logger.warn("JWT Not valid : "+ exception.getMessage());
+        }
+        return jwt;
+    }
+
     public boolean validTokenHasScopes(String token, String ... scopes) {
         try {
             if (scopes == null || scopes.length == 0) {
