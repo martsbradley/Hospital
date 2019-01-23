@@ -35,4 +35,7 @@ public class Auth0RSASolution {
         boolean isTokenValid = verifier.validTokenHasScopes(token, scopes);
         return isTokenValid;
     }
+    public boolean isTokenValid(String token) {
+        return false;
+    }
 }

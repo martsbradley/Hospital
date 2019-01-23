@@ -35,25 +35,26 @@ public class Auth0Verifier {
     }
 
     public boolean validTokenHasScopes(String token, String ... scopes) {
-        try {
-            if (scopes == null || scopes.length == 0) {
-                logger.warn("A scope is mandatory");
-                return false;
-            }
-            logger.debug("Checking token" + token);
-            DecodedJWT jwt = verifier.verify(token);
-            
-            logger.debug("Decoded successfully");
-
-            if (!jwtHasRequiredScope(jwt, scopes)) {
-                return false;
-            }
-
-            return true;
-        } catch (JWTVerificationException exception){
-            logger.warn("JWT Not valid : "+ exception.getMessage());
-        }
         return false;
+      //try {
+      //    if (scopes == null || scopes.length == 0) {
+      //        logger.warn("A scope is mandatory");
+      //        return false;
+      //    }
+      //    logger.debug("Checking token" + token);
+      //    DecodedJWT jwt = verifier.verify(token);
+      //    
+      //    logger.debug("Decoded successfully");
+
+      //    if (!jwtHasRequiredScope(jwt, scopes)) {
+      //        return false;
+      //    }
+
+      //    return true;
+      //} catch (JWTVerificationException exception){
+      //    logger.warn("JWT Not valid : "+ exception.getMessage());
+      //}
+      //return false;
     }
 
     private boolean jwtHasRequiredScope(DecodedJWT aJwt,
