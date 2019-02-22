@@ -29,12 +29,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private final String AUTH0_URL    = "AUTH0_URL";
     private final String AUTH0_ISSUER = "AUTH0_ISSUER";
     @Context ResourceInfo resourceInfo;
+    private String auth0Issuer;
 
     @Context
     public void setServletContext(ServletContext aContext) 
         throws JwkException {
         String auth0URL    = aContext.getInitParameter(AUTH0_URL);
-        String auth0Issuer = aContext.getInitParameter(AUTH0_ISSUER);
+        auth0Issuer = aContext.getInitParameter(AUTH0_ISSUER);
         logger.warn("auth0URL    : " + auth0URL);
         logger.warn("auth0Issuer : " + auth0Issuer);
         auth0RSA = new Auth0RSASolution(auth0URL, auth0Issuer);
@@ -83,8 +84,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
 
         // Check if the Authorization header is valid
-        // It must not be null and must be prefixed with "Bearer" plus a whitespace
-        // The authentication scheme comparison must be case-insensitive
+        // It must not be null and must be prefixed with "Bearer" plus a
+        // whitespace The authentication scheme comparison must be
+        // case-insensitive
         return authorizationHeader != null && authorizationHeader.toLowerCase()
                     .startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ");
     }
@@ -93,14 +95,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         SecuredRestfulMethodHelper helper = new
                                         SecuredRestfulMethodHelper();
 
-        String[] groups = helper.getGroups(resourceInfo);
+        String[] requiredGroups = helper.getGroups(resourceInfo);
 
-
-        logger.warn("auth0RSA is null? " + (auth0RSA == null));
-
-        boolean isValid = auth0RSA.canTokenAccess(token, groups);
-
-        logger.warn("Validated token as :" + isValid);
+        boolean isValid = auth0RSA.isValidAccessRequest(token, 
+                "https://gorticrum.com/user_authorization",
+                                                           requiredGroups);
+        logger.warn("Valid token ?" + isValid);
         return isValid;
     }
 }

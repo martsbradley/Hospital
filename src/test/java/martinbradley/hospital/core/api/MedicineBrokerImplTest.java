@@ -11,6 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import martinbradley.hospital.web.beans.PageInfo;
 import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.not;
+import martinbradley.hospital.core.api.dto.MedicineDTO;
 
 public class MedicineBrokerImplTest
 {
@@ -32,6 +38,31 @@ public class MedicineBrokerImplTest
         assertNotNull(impl.getMedicinesPaged(info));
     }
 
+    private void setupLoadById(final Medicine med) {
+        new Expectations(){{
+            mockRepo.findById(anyLong); 
+            result = med;
+        }};
+    }
+
+    @Test
+    public void loadByIdNotFound() {
+        setupLoadById(null);
+
+        MedicineDTO dto = impl.loadById(10);
+
+        assertThat(dto, is(nullValue()));
+    }
+
+    @Test
+    public void loadByIdFound() {
+        setupLoadById(new Medicine());
+
+        MedicineDTO dto = impl.loadById(10);
+
+        assertThat(dto, is(notNullValue()));
+    }
+
   //@Test
   //public void medicines_search_calls_repo()
   //{
@@ -40,4 +71,6 @@ public class MedicineBrokerImplTest
   //        mockRepo.searchMedicine(anyString); times = 1;
   //    }};
   //}
+  //
+  
 }

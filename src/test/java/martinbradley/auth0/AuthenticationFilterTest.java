@@ -39,7 +39,8 @@ public class AuthenticationFilterTest {
     private void expectedAuth0Result(final boolean authResult) 
         throws IOException, ServletException {
         new Expectations() {{
-            auth0.canTokenAccess((String)any,(String[])any);
+
+            auth0.isValidAccessRequest(anyString, anyString, (String[])any);
             result = authResult;
         }};
     }

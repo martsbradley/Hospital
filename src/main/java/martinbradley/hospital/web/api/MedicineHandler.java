@@ -49,4 +49,11 @@ public class MedicineHandler
         }
         return beans;
     }
+    public MedicineBean loadById(long id)
+    {
+        MedicineDTO dto = medBroker.loadById(id);
+        logger.info(String.format("loadById(%d) returned %s",id, dto));
+        MedicineBean bean = mapper.dtoToBean(dto);
+        return bean;
+    }
 }

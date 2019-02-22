@@ -51,4 +51,11 @@ public class MedicineBrokerImpl implements MedicineBroker
         }
         return dtoList;
     }
+
+    @Override
+    public MedicineDTO loadById(long id) {
+        Medicine med = repo.findById(id);
+        MedicineDTO dto = mapper.medicineToDTO(med);
+        return dto;
+    }
 }

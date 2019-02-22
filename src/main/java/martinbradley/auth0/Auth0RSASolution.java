@@ -31,11 +31,12 @@ public class Auth0RSASolution {
                                      provider.getPublicKey(null)); 
     }
 
-    public boolean canTokenAccess(String token, String... scopes) {
-        boolean isTokenValid = verifier.validTokenHasScopes(token, scopes);
-        return isTokenValid;
-    }
-    public boolean isValidAccessRequest(String token, String ... groups) {
-        return false;
+    public boolean isValidAccessRequest(String token, 
+                                        String namespace,
+                                        String ... groups) {
+
+        return verifier.isValidAccessRequest(token, 
+                                             namespace,
+                                             groups);
     }
 }

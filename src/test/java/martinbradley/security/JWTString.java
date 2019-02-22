@@ -1,13 +1,19 @@
 package martinbradley.security;
 import java.util.StringJoiner;
 import java.util.Arrays;
+import org.json.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class JWTString {
     private final String issuer;
     private final long iat;
     private final long exp;
     private final String scope;
-    private final String namespace, groups;  
+    private final String namespace;
+    private final String[] groups;  
+    private static final Logger logger = LoggerFactory.getLogger(JWTString.class);
 
     private JWTString(Builder aBuilder) {
         issuer    = aBuilder.issuer;
@@ -18,26 +24,39 @@ public class JWTString {
         groups    = aBuilder.groups;
     }
 
-    public Object[] getHeader() {
-        Object[] header = {"alg","RS256", 
-                           "typ", "JWT"};
-        return header;
+    public String getHeader() {
+        JSONObject header = new JSONObject();
+        header.put("alg", "RS256");
+        header.put("typ", "JWT");
+
+        return header.toString();
     }
-    public Object[] getPayload() {
-        Object[] payload = {"sub","1234567890",
-                            "name", "Martin Bradley",
-                            "iss", issuer,
-                            "scope", scope,
-                            "iat", new Long(iat),
-                            "exp", new Long(exp)}; 
+    public String getPayload() {
+
+        logger.debug("**Building Payload");
+        JSONObject payload = new JSONObject();
+        payload.put("sub","1234567890");
+        payload.put("name", "Martin Bradley");
+        payload.put("iss", issuer);
+        payload.put("scope", scope);
+        payload.put("iat", new Long(iat));
+        payload.put("exp", new Long(exp));
+
+        logger.debug("payload" + payload.toString());
 
         if (namespace != null && groups != null) {
-            Object larger[] = Arrays.copyOf(payload, payload.length+2);
-            larger[larger.length-2] = namespace;
-            larger[larger.length-1] = "groups: [" + groups + "]";
-            payload = larger;
+            JSONArray groupsArray = new JSONArray(groups);
+            JSONObject group = new JSONObject();
+
+            group.put("groups",groupsArray);
+
+            payload.put(namespace, group);
         }
-        return payload;
+
+        String strPayload = payload.toString();
+        logger.debug("payload done " + strPayload);
+
+        return strPayload;
     }
 
     public static class Builder {
@@ -46,7 +65,7 @@ public class JWTString {
         long exp;
         String scope;
         String namespace;
-        String groups;
+        String[] groups;
 
         public Builder setIssuer(String aIssuer) {
             this.issuer = aIssuer;
@@ -66,11 +85,7 @@ public class JWTString {
         }
         public Builder setGroups(String namespace, String ... groups) {
             this.namespace = namespace;
-            StringJoiner joiner = new StringJoiner(",");
-            for (String group: groups) {
-                joiner.add(group);
-            }
-            this.groups = joiner.toString();
+            this.groups = groups;
             return this;
         }
         public JWTString build(){

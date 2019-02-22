@@ -22,7 +22,7 @@ import martinbradley.security.JWTSigner;
 import martinbradley.security.RSASigner;
 
 public class Auth0VerifierTest {
-    private static final Logger logger = LoggerFactory.getLogger(JWTSigner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Auth0VerifierTest.class);
     final KeyPair keyPair;
     final String issuer = "https://myeducation.eu.auth0.com/";
     JWTString.Builder builder;
@@ -56,6 +56,22 @@ public class Auth0VerifierTest {
         return builder;
     }
 
+    private String createJWT() throws Exception {
+
+        JWTString jwtString = builder.build();
+        String header = jwtString.getHeader();
+        logger.info("Header is " + header);
+        String payload = jwtString.getPayload();
+        logger.info("Payload is " + payload);
+
+        JWTSigner signer = new JWTSigner(keyPair);
+        signer.setHeader(header);
+        signer.setPayload(payload);
+
+        String jwt = signer.createSignedJWT();
+        return jwt;
+    }
+
     private String createExpiredJWT() throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
@@ -72,19 +88,6 @@ public class Auth0VerifierTest {
         return createJWT();
     }
 
-    private String createJWT() throws Exception {
-
-        JWTString jwtString = builder.build();
-        Object[] header = jwtString.getHeader();
-        Object[] payload = jwtString.getPayload();
-
-        JWTSigner signer = new JWTSigner(keyPair);
-        signer.setHeader(header);
-        signer.setPayload(payload);
-
-        String jwt = signer.createSignedJWT();
-        return jwt;
-    }
 
     private String createValidJWT() throws Exception {
 
@@ -100,6 +103,20 @@ public class Auth0VerifierTest {
 
         Auth0Verifier auth = new Auth0Verifier(issuer, pub);
         return auth;
+    }
+
+    private void validate(String aIssuer, 
+                          boolean expectedResult,
+                          String ...aScopes) 
+        throws Exception {
+
+        String validJWT = createValidJWT();
+
+        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
+
+        Auth0Verifier auth = new Auth0Verifier(aIssuer, pub);
+        boolean isValid = auth.validTokenHasScopes(validJWT, aScopes);
+        assertThat(isValid, is(expectedResult));
     }
 
     @Test
@@ -127,6 +144,7 @@ public class Auth0VerifierTest {
         boolean isValid = auth.tokenIsValid(validJWT);
         assertThat(isValid, is(true));
     }
+
     @Test
     public void tokenIsNotValid() throws Exception {
         String invalidJWT = "This not a valid token";
@@ -161,7 +179,7 @@ public class Auth0VerifierTest {
         assertThat(isValid, is(false));
     }
     @Test
-    public void groupsSetIncorreclty() throws Exception {
+    public void groupsSetIncorrectly() throws Exception {
 
         builder.setGroups("namespace", "normal");
 
@@ -173,7 +191,6 @@ public class Auth0VerifierTest {
         assertThat(isValid, is(false));
     }
 
-
     @Test
     public void testJwtBlankScope() throws Exception {
         validate(issuer, false, "");
@@ -183,29 +200,14 @@ public class Auth0VerifierTest {
     public void testValidJwtNoScopes() throws Exception {
         validate(issuer, false);
     }
+
     @Test
     public void testValidJwt() throws Exception {
-
         validate(issuer, true, "read:patients");
     }
 
     @Test
     public void testValidJwtTwoScopes() throws Exception {
-
         validate(issuer, true, "openid", "read:patients");
-    }
-
-    private void validate(String aIssuer, 
-                          boolean expectedResult,
-                          String ...aScopes) 
-        throws Exception {
-
-        String validJWT = createValidJWT();
-
-        RSAPublicKey pub = (RSAPublicKey)keyPair.getPublic();
-
-        Auth0Verifier auth = new Auth0Verifier(aIssuer, pub);
-        boolean isValid = auth.validTokenHasScopes(validJWT, aScopes);
-        assertThat(isValid, is(expectedResult));
     }
 }

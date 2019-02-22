@@ -9,4 +9,6 @@ public interface MedicineBroker
 {
     List<MedicineDTO> getMedicinesPaged(PageInfo pageInfo);
     int getTotalMedicines(String filter);
+
+    MedicineDTO loadById(long id);
 }

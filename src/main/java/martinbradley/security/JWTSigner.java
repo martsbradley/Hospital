@@ -24,13 +24,11 @@ public class JWTSigner {
         this.keyPair = keyPair;
     }
 
-    public void setHeader(Object ... header) {
-        Joiner joiner = new Joiner();
-        unencodedHeader = joiner.create(header);
+    public void setHeader(String unencodedHeader) {
+        this.unencodedHeader = unencodedHeader;
     }
-    public void setPayload(Object ... payload) {
-        Joiner joiner = new Joiner();
-        unencodedPayload = joiner.create(payload);
+    public void setPayload(String unencodedPayload) {
+        this.unencodedPayload = unencodedPayload;
     }
 
     public String createSignedJWT() 
@@ -85,28 +83,39 @@ public class JWTSigner {
         return output;
     }
 
-    private static class Joiner {
-        StringJoiner joiner = new StringJoiner(",", "{", "}");
+  //private static class Joiner {
+  //    StringJoiner joiner = new StringJoiner(",", "{", "}");
 
-        public String create(Object ... args) {
+  //    public String create(Object ... args) {
 
-            Iterator<Object> it = Arrays.asList(args).iterator();
+  //        Iterator<Object> it = Arrays.asList(args).iterator();
 
-            while (it.hasNext()) {
-                String key = (String)it.next();
-                Object value = it.next();
+  //        while (it.hasNext()) {
+  //            String key = (String)it.next();
+  //            Object value = it.next();
 
-                String item = getJWTSource(key, value);
-                joiner.add(item);
-            }
-            return joiner.toString();
-        }
+  //            String item = getJWTSource(key, value);
+  //            joiner.add(item);
+  //        }
+  //        return joiner.toString();
+  //    }
 
-        private String getJWTSource(String key, Object value) {
-            if (value instanceof String)
-                return String.format("\"%s\":\"%s\"", key,value);
-            else
-                return String.format("\"%s\":%d", key, value);
-        }
-    }
+  //    private String getJWTSource(String key, Object value) {
+
+  //        if (value instanceof String) {
+  //            String valStr = (String)value;
+
+  //            if (valStr.indexOf("{") == 0) {
+  //                // handle objects
+  //                return String.format("\"%s\":%s", key,value);
+  //            }
+  //            else {
+  //                return String.format("\"%s\":\"%s\"", key,value);
+  //            }
+  //        }
+  //        else {
+  //            return String.format("\"%s\":%d", key, value);
+  //        }
+  //    }
+  //}
 }

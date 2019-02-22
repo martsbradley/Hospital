@@ -2,6 +2,7 @@ package martinbradley.hospital.rest;
 
 import martinbradley.hospital.web.beans.PatientBean;
 import martinbradley.hospital.web.beans.MedicineBean;
+import martinbradley.hospital.web.beans.PrescriptionBean;
 import martinbradley.hospital.web.beans.ValidationErrors;
 import martinbradley.hospital.web.beans.ValidationError;
 
@@ -42,11 +43,10 @@ import martinbradley.auth0.SecuredRestfulMethod;
 @Path("/hospital")
 public class HospitalResourceImpl 
 {
-    private static final String ADMIN_ROLE="AdminUsers";
+    //private static final String ADMIN_ROLE="AdminUsers";
     @Inject PatientHandler patientHandler;
     @Inject MedicineHandler medicineHandler;
     private static Logger logger = LoggerFactory.getLogger(HospitalResourceImpl.class);
-
 
     @GET
     @Path("patient/{id}")
@@ -58,9 +58,6 @@ public class HospitalResourceImpl
 
         if (patient == null)
         {
-          //return Response.status(Status.NOT_FOUND)
-          //               .type(MediaType.APPLICATION_JSON)
-          //               .build();
             throw new NotFoundException();
         }
 
@@ -69,11 +66,9 @@ public class HospitalResourceImpl
                        .build();
     }
 
-    //"/patient?start=1&max=5?sortby=forname"
     @GET
     @Path("patients/")
     @Produces("application/json")
-    @SecuredRestfulMethod(groups={"read:patients"})
     public Response pagePatients(@QueryParam("start")  int aStart,
                                  @QueryParam("max")    int aMax,
                                  @QueryParam("sortby") String aSortBy)
@@ -92,7 +87,58 @@ public class HospitalResourceImpl
                        .build();
     }
 
-    //"/medicines?start=1&max=5&sortby=forname&filter=me
+    @POST
+    @Path("patient")
+    @Produces("application/json")
+    @SecuredRestfulMethod(groups={"adminGroup"})
+    public Response savePatient(PatientBean patientBean)
+    {
+        logger.info("savePatient " + patientBean);
+	ValidationErrors validationResult = validate(patientBean);
+
+	if (validationResult.hasErrors()) {
+	    logger.info("savePatient returning validation message");
+            return Response.status(Status.BAD_REQUEST)
+                           .type(MediaType.APPLICATION_JSON)
+                           .entity(validationResult)
+                           .build();
+	}
+
+
+        MessageCollection messages = new MessageCollection();
+        Long id = patientHandler.savePatient(patientBean, messages);
+        IdentifierBean ident = new IdentifierBean();
+        ident.setId(id);
+        
+        if (id == null || messages.hasMessages())
+        {
+            logger.info("Failed to save" + messages);
+            return Response.status(Status.BAD_REQUEST)
+                           .type(MediaType.APPLICATION_JSON)
+                           .entity(messages.toString())
+                           .build();
+        }
+
+        logger.info("savePatient successful");
+
+        return Response.accepted(ident)
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
+    @GET
+    @Path("patients/total")
+    @Produces("application/json")
+    public Response totalPatients()
+    {
+        logger.debug("totalPatients called");
+        int total = patientHandler.getTotalPatients();
+
+        return Response.accepted(total)
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
     @GET
     @Path("medicines/")
     @Produces("application/json")
@@ -116,46 +162,46 @@ public class HospitalResourceImpl
         return Response.accepted(entity)
                        .type(MediaType.APPLICATION_JSON)
                        .build();
+    }
+    @POST
+    @Path("patient/{patientId}/medicine/{medicineId}")
+    @Produces("application/json")
+    @SecuredRestfulMethod(groups={"adminGroup"})
+    public Response savePrescription(@PathParam("patientId") long patientId,  
+                                     @PathParam("medicineId") long medicineId,  
+                                     PrescriptionBean prescriptionBean)
+    {
+        PatientBean patient = patientHandler.loadById(patientId);
+        MedicineBean medicine = medicineHandler.loadById(medicineId);
+        prescriptionBean.setPatient(patient);
+        prescriptionBean.setMedicine(medicine);
 
+        logger.debug("savePrescription called ");
+        logger.debug("medicineId " + medicineId);
+        logger.debug("prescriptionBean " + prescriptionBean);
+        logger.debug("patientId " + patientId);
+        logger.debug(patient.getForename() + " " + patient.getSurname());
+
+        logger.debug("Loaded up the " + prescriptionBean);
+
+
+        patient.addPrescription(prescriptionBean);
+
+        Response result = savePatient(patient);
+
+        //return Response.status(Response.Status.OK).build();
+        return result;
     }
 
-
-
-    @POST
-    @Path("patient")
+    @GET
+    @Path("medicines/total")
     @Produces("application/json")
-    public Response savePatient(PatientBean patientBean)
+    public Response totalMedicines(@QueryParam("filter") String filter)
     {
-        logger.info("savePatient " + patientBean);
-	ValidationErrors validationResult = validate(patientBean);
+        logger.debug("totalMedicines called");
+        int total = medicineHandler.getTotalMedicines(filter);
 
-	if (validationResult.hasErrors()) {
-	    logger.info("savePatient returning validation message");
-            return Response.status(Status.BAD_REQUEST)
-                           .type(MediaType.APPLICATION_JSON)
-                           //.entity("bla")
-                           .entity(validationResult)
-                           .build();
-	}
-
-
-        MessageCollection messages = new MessageCollection();
-        Long id = patientHandler.savePatient(patientBean, messages);
-        IdentifierBean ident = new IdentifierBean();
-        ident.setId(id);
-        
-        if (id == null || messages.hasMessages())
-        {
-            logger.info("Failed to save" + messages);
-            return Response.status(Status.BAD_REQUEST)
-                           .type(MediaType.APPLICATION_JSON)
-                           .entity(messages.toString())
-                           .build();
-        }
-
-        logger.info("savePatient successful");
-
-        return Response.accepted(ident)
+        return Response.accepted(total)
                        .type(MediaType.APPLICATION_JSON)
                        .build();
     }
@@ -187,79 +233,51 @@ public class HospitalResourceImpl
     }
 
 
-    @GET
-    @Path("patients/total")
-    @Produces("application/json")
-    @SecuredRestfulMethod(groups={"read:patients"})
-    public Response totalPatients()
-    {
-        logger.debug("totalPatients called");
-        int total = patientHandler.getTotalPatients();
+  //@GET
+  //@Path("userDetail")
+  //@Produces("application/text")
+  //public Response userDetails(@Context SecurityContext sc) {
 
-        return Response.accepted(total)
-                       .type(MediaType.APPLICATION_JSON)
-                       .build();
-    }
+  //    String username = "";
 
-    @GET
-    @Path("medicines/total")
-    @Produces("application/json")
-    public Response totalMedicines(@QueryParam("filter") String filter)
-    {
-        logger.debug("totalMedicines called");
-        int total = medicineHandler.getTotalMedicines(filter);
+  //    if (isAdminLoggedIn(sc)) {
+  //        username = sc.getUserPrincipal().getName();
+  //    }
+  //    logger.info("userDetails :'"+ username + "'");
 
-        return Response.accepted(total)
-                       .type(MediaType.APPLICATION_JSON)
-                       .build();
-    }
+  //    return Response.accepted(username)
+  //                   .type(MediaType.TEXT_PLAIN)
+  //                   .build();
+  //}
 
+  //@GET
+  //@Path("isAdmin")
+  //@Produces("application/text")
+  //public Response isAdmin(@Context SecurityContext sc) {
 
-    @GET
-    @Path("userDetail")
-    @Produces("application/text")
-    public Response userDetails(@Context SecurityContext sc) {
+  //    boolean isAdmin = isAdminLoggedIn(sc);
 
-        String username = "";
-
-        if (isAdminLoggedIn(sc)) {
-            username = sc.getUserPrincipal().getName();
-        }
-        logger.info("userDetails :'"+ username + "'");
-
-        return Response.accepted(username)
-                       .type(MediaType.TEXT_PLAIN)
-                       .build();
-    }
-
-    @GET
-    @Path("isAdmin")
-    @Produces("application/text")
-    public Response isAdmin(@Context SecurityContext sc) {
-
-        boolean isAdmin = isAdminLoggedIn(sc);
-
-        logger.debug("isAdmin :"+ isAdmin);
-        return Response.accepted(isAdmin)
-                       .type(MediaType.TEXT_PLAIN)
-                       .build();
-    }
+  //    logger.debug("isAdmin :"+ isAdmin);
+  //    return Response.accepted(isAdmin)
+  //                   .type(MediaType.TEXT_PLAIN)
+  //                   .build();
+  //}
 
 
-    @POST
-    @Path("logOff")
-    @Produces("application/text")
-    public Response isAdmin(@Context HttpServletRequest req) {
+  //@POST
+  //@Path("logOff")
+  //@Produces("application/text")
+  //public Response isAdmin(@Context HttpServletRequest req) {
 
-        req.getSession().invalidate();
+  //    req.getSession().invalidate();
 
-        return Response.status(Status.UNAUTHORIZED)
-                       .type(MediaType.TEXT_PLAIN)
-                       .build();
-    }
+  //    return Response.status(Status.UNAUTHORIZED)
+  //                   .type(MediaType.TEXT_PLAIN)
+  //                   .build();
+  //}
 
-    private boolean isAdminLoggedIn(SecurityContext sc) {
-        boolean isAdmin = sc.isUserInRole(ADMIN_ROLE);
-        return isAdmin;
-    }
+  //private boolean isAdminLoggedIn(SecurityContext sc) {
+  //    boolean isAdmin = sc.isUserInRole(ADMIN_ROLE);
+  //    return isAdmin;
+  //}
 }

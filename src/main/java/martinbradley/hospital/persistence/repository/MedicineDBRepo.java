@@ -126,6 +126,16 @@ public class MedicineDBRepo {
         return sameNamedMedicines;
 
     }
+    
+    public Medicine findById(long medicineId)
+    {
+        logger.info("******findById***********");
+        Medicine medicine = entityManager.find(Medicine.class, medicineId);
+
+        logger.info("findById " + medicine);
+
+        return medicine;
+    }
 
   //public long saveMedicine(Medicine aMedicine)
   //{
@@ -176,21 +186,6 @@ public class MedicineDBRepo {
 //      return true;
 //  }
 
-//  @Override
-//  public Medicine findById(long patientId)
-//  {
-//          logger.info("******findById***********");
-//          Session session = sessionFactory.getCurrentSession();
-//          Medicine patient = (Medicine) session.get(Medicine.class, patientId);
-
-//          logger.info("findById " + patient);
-
-//          Hibernate.initialize(patient.getPrescription());
-
-//          //for (Prescription p: patient.getPrescription())
-
-//      return patient;
-//  }
 
 //  @Override
 //  public List<Prescription> getPrescriptions(long patientId)

@@ -12,6 +12,11 @@ import martinbradley.hospital.core.api.MedicineBroker;
 import martinbradley.hospital.web.beans.MedicineBean;
 import martinbradley.hospital.web.beans.PageInfo;
 import static martinbradley.hospital.web.beans.PageInfo.PageInfoBuilder;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.not;
 
 public class MedicineHandlerTest
 {
@@ -90,4 +95,28 @@ public class MedicineHandlerTest
   //        mockBroker.searchMedicine(anyString); times = 1;
   //    }};
   //}
+  //
+    private void setupLoadById(final MedicineDTO dto) {
+        new Expectations(){{
+            mockBroker.loadById(anyLong); 
+            result = dto;
+        }};
+    }
+    @Test
+    public void loadByNegativeIsNull() {
+
+        setupLoadById(null);
+
+        MedicineBean bean = impl.loadById(-1);
+
+        assertThat(bean, is(nullValue()));
+    }
+
+    @Test
+    public void loadByIdSuccess() {
+        setupLoadById(new MedicineDTO());
+        MedicineBean bean = impl.loadById(10);
+        assertThat(bean, is(notNullValue()));
+    }
+
 }
