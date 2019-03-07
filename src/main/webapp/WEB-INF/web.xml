@@ -21,13 +21,15 @@
         <param-value>true</param-value>
     </context-param>
 
+        <!--   <param-value>https://myeducation.eu.auth0.com</param-value>    
+               <param-value>https://myeducation.eu.auth0.com/</param-value> -->
     <context-param>
         <param-name>AUTH0_URL</param-name>
-        <param-value>https://myeducation.eu.auth0.com</param-value>
+        <param-value>https://localhosthttpstennant.eu.auth0.com</param-value>
     </context-param>
     <context-param>
         <param-name>AUTH0_ISSUER</param-name>
-        <param-value>https://myeducation.eu.auth0.com/</param-value>
+        <param-value>https://localhosthttpstennant.eu.auth0.com/</param-value>
     </context-param>
 
     <servlet>
