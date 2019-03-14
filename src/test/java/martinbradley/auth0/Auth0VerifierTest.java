@@ -12,8 +12,10 @@ import java.util.StringJoiner;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -186,7 +188,7 @@ public class Auth0VerifierTest {
         String validJWT = createJWT();
 
         Auth0Verifier auth = createVerifier();
-                                                    // Missing the groups on the request
+                                       // Missing the groups on the request
         boolean isValid = auth.isValidAccessRequest(validJWT, "namespace");
         assertThat(isValid, is(false));
     }
@@ -209,5 +211,51 @@ public class Auth0VerifierTest {
     @Test
     public void testValidJwtTwoScopes() throws Exception {
         validate(issuer, true, "openid", "read:patients");
+    }
+
+    @Test
+    public void testReadGroups() throws Exception {
+        builder.setGroups("namespace", "admin");
+
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+        Set<String> groups = auth.readGroups(validJWT, "namespace");
+        assertThat(groups.size(), is(1));
+        assertThat(groups.contains("admin"), is(true));
+    }
+    @Test
+    public void testReadNoGroups() throws Exception {
+
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+        Set<String> groups = auth.readGroups(validJWT, "namespace");
+        assertThat(groups.size(), is(0));
+    }
+    @Test
+    public void testReadThreeGroups() throws Exception {
+
+        builder.setGroups("namespace", "admin","controllers", "wasters");
+        String validJWT = createJWT();
+
+        Auth0Verifier auth = createVerifier();
+        Set<String> groups = auth.readGroups(validJWT, "namespace");
+
+        assertThat(groups.size(), is(3));
+        assertThat(groups.contains("admin"),       is(true));
+        assertThat(groups.contains("controllers"), is(true));
+        assertThat(groups.contains("wasters"),     is(true));
+    }
+
+    @Test
+    public void testReadGroupsInvalid() throws Exception {
+        assertThrows(Exception.class,
+                () -> {
+            String inValidJWT = "This not a valid token";
+
+            Auth0Verifier auth = createVerifier();
+            Set<String> groups = auth.readGroups(inValidJWT, "namespace");
+        });
     }
 }

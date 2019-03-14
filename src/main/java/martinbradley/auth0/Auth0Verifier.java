@@ -43,6 +43,18 @@ public class Auth0Verifier {
         return result != null;
     }
 
+    public Set<String> readGroups(String token, 
+                           String namespace) throws Exception {
+
+        DecodedJWT jwt = getToken(token);
+        if (jwt == null) {
+            throw new Exception("Token invalid");
+        }
+
+        Set<String> allowedGroups = allowedGroups(jwt, namespace);
+
+        return allowedGroups;
+    }
     public boolean isValidAccessRequest(String token, 
                                         String namespace,
                                         String ... aRequiredGroups) {

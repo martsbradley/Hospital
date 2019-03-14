@@ -263,5 +263,10 @@
            <artifactId>json</artifactId>
            <version>20180813</version>
         </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>mvc-auth-commons</artifactId>
+            <version>1.0.3</version>
+        </dependency>
     </dependencies>
 </project>
