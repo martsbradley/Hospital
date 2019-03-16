@@ -85,20 +85,6 @@ public class CallbackServlet extends HttpServlet {
         }
     }
 
-//  /**
-//   * Process a call to the redirect_uri with a GET HTTP method.
-//   *
-//   * @param req the received request with the tokens (implicit grant) or the authorization code (code grant) in the parameters.
-//   * @param res the response to send back to the server.
-//   * @throws IOException
-//   * @throws ServletException
-//   */
-//  @Override
-//  public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-//      handle(req, res);
-//  }
-
-
     /**
      * Process a call to the redirect_uri with a POST HTTP method. This occurs if the authorize_url included the 'response_mode=form_post' value.
      * This is disabled by default. On the Local Servlet scope you can specify the 'com.auth0.allow_post' parameter to enable this behaviour.
@@ -117,9 +103,19 @@ public class CallbackServlet extends HttpServlet {
         logger.debug("QueryString " +req.getQueryString());
 
         try {
-            handleAuthToken(req, res);
+            handleCookies(req, res);
 
             logger.debug("Success Redirecting to " + redirectOnSuccess);
+
+            HttpSession session = req.getSession(false);
+
+            if (session != null) {
+                session.invalidate();
+                logger.debug("Deleted session");
+                // session only needed for the auth0 callback code.
+                // session will not record client state since 
+                // the jwt is passed in each request.
+            }
 
             res.sendRedirect(redirectOnSuccess);
 
@@ -133,39 +129,28 @@ public class CallbackServlet extends HttpServlet {
         }
     }
 
-    private void handleAuthToken(HttpServletRequest req,
-                                 HttpServletResponse res) throws Exception {
+    private void handleCookies(HttpServletRequest req, HttpServletResponse res) 
+        throws Exception {
+
         Tokens tokens = authenticationController.handle(req);
+
         String jSWebToken = tokens.getAccessToken();
         Set<String> groups = verifier.readGroups(jSWebToken, auth0Namespace);
 
         String groupsStr = groups.stream().collect(Collectors.joining(","));
 
-        Cookie groupsCookie = new Cookie("auth0Groups", groupsStr);
-        groupsCookie.setSecure(true);
-
-        Cookie jwtCookie = new Cookie("jwtToken", jSWebToken);
-        jwtCookie.setSecure(true);
-        jwtCookie.setHttpOnly(true);
-
-        res.addCookie(groupsCookie);
-        res.addCookie(jwtCookie);
-        logger.debug("Added Cookie " + groupsCookie);
-        logger.debug("Added Cookie " + jwtCookie);
-
-
-        // Between the login and the callback the http session
-        // stores some data for auth0
-        // after this callback is executed that state is no longer needed.
-        // removing the session because for a restful frontend there
-        // should be no client state stored.
-
-        HttpSession session = req.getSession(false);
-
-        if (session != null) {
-            session.invalidate();
-            logger.debug("Got rid of the session " + jwtCookie);
-            // session only needed for the auth0 callback.
+        Long expiresIn = tokens.getExpiresIn();
+        String expiresInStr = "-1";
+        if (expiresIn != null) {
+            expiresInStr = expiresIn.toString();
+            expiresInStr = "900";// 15 minutes.   Unsure why the value from  
+                                 // auth0 is not coming across.
+                                 // maybe because auth0 is not so great?
         }
+
+        CookieHandler cookieHandler = new CookieHandler();
+        logger.info("JWT token is " + jSWebToken);
+
+        cookieHandler.handleSuccessfulLogin(res, jSWebToken, groupsStr, expiresInStr);
     }
 }

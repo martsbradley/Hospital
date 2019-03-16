@@ -46,7 +46,7 @@
 
     <context-param>
         <param-name>AUTH0_LOGIN_SUCCESS</param-name>
-        <param-value>https://localhost:3000/</param-value>
+        <param-value>https://localhost:3000/loginsuccess</param-value>
     </context-param>
     <context-param>
         <param-name>AUTH0_LOGIN_FAILURE</param-name>
