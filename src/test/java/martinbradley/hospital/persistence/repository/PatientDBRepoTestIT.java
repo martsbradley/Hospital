@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
@@ -21,6 +22,7 @@ public class PatientDBRepoTestIT
 {
     @Injectable EntityManager entityManager;
     @Injectable UserTransaction tx;
+    @Mocked PatientRepoHelper helper;
     @Tested PatientDBRepo impl;
 
     @Test
@@ -50,7 +52,7 @@ public class PatientDBRepoTestIT
         Patient existingPatient = new Patient();
         existingPatient.setId(1L);
 
-        namedqueryReturns(playerQuery, existingPatient);
+        mockCheckDuplicateCall(false);
 
         SavePatientResponse response = impl.savePatient(patient);
 
@@ -58,20 +60,11 @@ public class PatientDBRepoTestIT
         assertThat(thereAreErrors, is(not(true)));
     }
 
-    private void namedqueryReturns(final TypedQuery playerQuery, final Patient ... patients)
+    private void mockCheckDuplicateCall(final boolean isDuplicate)
     {
-	final ArrayList<Patient> patientsWithSameName = new ArrayList<>();
-        for (Patient p : patients)
-        {
-            patientsWithSameName.add(p);
-        }
-
-	new Expectations(){{   
-	    entityManager.createNamedQuery(anyString, Patient.class);
-	    result = playerQuery;
-
-	    playerQuery.getResultList();
-	    result = patientsWithSameName;
+        new Expectations() {{   
+            helper.duplicatePatientCheck((EntityManager)any, (Patient)any);
+            result = isDuplicate;
         }};
     }
 
@@ -84,7 +77,23 @@ public class PatientDBRepoTestIT
         Patient existingPatient = new Patient();
         existingPatient.setId(4L);
 
-        namedqueryReturns(playerQuery, existingPatient);
+        mockCheckDuplicateCall(true);
+
+        SavePatientResponse response = impl.savePatient(patient);
+
+        boolean thereAreErrors = response.getMessages().iterator().hasNext();
+        assertThat(thereAreErrors, is(true));
+    }
+
+    @Test void cannot_patient_too_many_patients(@Mocked TypedQuery playerQuery) {
+        Patient patient = new Patient();
+
+        mockCheckDuplicateCall(false);
+
+        new Expectations(){{   
+            helper.getTotalPatients((EntityManager)any);
+            result = 151;
+        }};
 
         SavePatientResponse response = impl.savePatient(patient);
 

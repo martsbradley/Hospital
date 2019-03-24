@@ -1,7 +1,6 @@
 package martinbradley.auth0;
 
-import com.auth0.AuthenticationController;
-
+import com.auth0.client.auth.AuthAPI;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
@@ -23,14 +22,14 @@ public class AuthenticationControllerProvider {
         clientSecret = servletContext.getInitParameter("com.auth0.clientSecret");
     }
 
-    public AuthenticationController getAuthController() throws UnsupportedEncodingException {
+    public AuthAPI getAuthAPI() throws UnsupportedEncodingException {
 
         logger.debug("com.auth0.domain       " + domain);
         logger.debug("com.auth0.clientId     " + clientId);   
         logger.debug("com.auth0.clientSecret " + clientSecret);
 
-        return AuthenticationController.newBuilder(domain, clientId, clientSecret)
-                                       .withResponseType("token")
-                                       .build();
+        return new AuthAPI(domain, clientId, clientSecret);
+                                     //.withResponseType("token")
+                                     //.build();
     }
 }

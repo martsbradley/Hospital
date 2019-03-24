@@ -7,12 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import javax.servlet.ServletConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(urlPatterns = {"/logout"})
 public class LogoutServlet extends HttpServlet {
 
     private String domain   = "";
     private String clientId = "";
+    private static Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -23,17 +26,17 @@ public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("LogoutServlet");
+        logger.debug("QueryString " +request.getQueryString());
         if (request.getSession() != null) {
             request.getSession().invalidate();
-            System.out.println("LogoutServlet invalidate called");
+            logger.warn("LogoutServlet invalidate called");
         }
 
         String returnTo = "https://localhost:3000/logoutsuccess";
 
         String logoutUrl = String.format("https://%s/v2/logout?client_id=%s&returnTo=%s", domain, clientId, returnTo);
 
-        System.out.println("LogoutServlet redirect to '" + logoutUrl + "'");
+        logger.warn("LogoutServlet redirect to '" + logoutUrl + "'");
 
         CookieHandler cookieHandler = new CookieHandler();
         cookieHandler.clearCookies(response);

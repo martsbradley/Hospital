@@ -1,11 +1,9 @@
 package martinbradley.auth0;
 
-import com.auth0.AuthenticationController;
-import com.auth0.IdentityVerificationException;
+import com.auth0.client.auth.AuthAPI;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
-import com.auth0.Tokens;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -18,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
+import java.util.Enumeration;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +36,7 @@ public class CallbackServlet extends HttpServlet {
     public static final String AUTH0_NAMESPACE = "AUTH0_NAMESPACE";
 
 
-    private AuthenticationController authenticationController;
+    private AuthAPI authenticationController;
     private static Logger logger = LoggerFactory.getLogger(CallbackServlet.class);
     private Auth0Verifier verifier;
 
@@ -69,7 +68,7 @@ public class CallbackServlet extends HttpServlet {
         
         try {
             authenticationController = new AuthenticationControllerProvider(config)
-                                                            .getAuthController();
+                                                            .getAuthAPI();
 
             Auth0KeyProvider provider = new Auth0KeyProvider(auth0URL);
             
@@ -96,6 +95,12 @@ public class CallbackServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+        logger.warn("doPost Called");
+        handle(req, res);
+    }
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+        logger.warn("doGet Called");
         handle(req, res);
     }
 
@@ -105,7 +110,6 @@ public class CallbackServlet extends HttpServlet {
         try {
             handleCookies(req, res);
 
-            logger.debug("Success Redirecting to " + redirectOnSuccess);
 
             HttpSession session = req.getSession(false);
 
@@ -117,6 +121,7 @@ public class CallbackServlet extends HttpServlet {
                 // the jwt is passed in each request.
             }
 
+            logger.debug("Success Redirecting to " + redirectOnSuccess);
             res.sendRedirect(redirectOnSuccess);
 
         } catch (Exception e) {
@@ -132,25 +137,43 @@ public class CallbackServlet extends HttpServlet {
     private void handleCookies(HttpServletRequest req, HttpServletResponse res) 
         throws Exception {
 
-        Tokens tokens = authenticationController.handle(req);
 
-        String jSWebToken = tokens.getAccessToken();
-        Set<String> groups = verifier.readGroups(jSWebToken, auth0Namespace);
+        Enumeration<String> parameterNames = req.getParameterNames();
 
-        String groupsStr = groups.stream().collect(Collectors.joining(","));
+        while (parameterNames.hasMoreElements()) {
 
-        Long expiresIn = tokens.getExpiresIn();
-        String expiresInStr = "-1";
-        if (expiresIn != null) {
-            expiresInStr = expiresIn.toString();
-            expiresInStr = "900";// 15 minutes.   Unsure why the value from  
-                                 // auth0 is not coming across.
-                                 // maybe because auth0 is not so great?
+            String paramName = parameterNames.nextElement();
+            logger.warn("Param  "+ paramName);
+
+            String[] paramValues = req.getParameterValues(paramName);
+            for (int i = 0; i < paramValues.length; i++) {
+                String paramValue = paramValues[i];
+                logger.warn("ParamValue  "+ paramValue);
+            }
+
         }
 
-        CookieHandler cookieHandler = new CookieHandler();
-        logger.info("JWT token is " + jSWebToken);
 
-        cookieHandler.handleSuccessfulLogin(res, jSWebToken, groupsStr, expiresInStr);
+
+      //Tokens tokens = authenticationController.handle(req);
+
+      //String jSWebToken = tokens.getAccessToken();
+      //Set<String> groups = verifier.readGroups(jSWebToken, auth0Namespace);
+
+      //String groupsStr = groups.stream().collect(Collectors.joining(","));
+
+      //Long expiresIn = tokens.getExpiresIn();
+      //String expiresInStr = "-1";
+      //if (expiresIn != null) {
+      //    expiresInStr = expiresIn.toString();
+      //    expiresInStr = "3600";// 900 = 15 minutes.   Unsure why the value from  
+      //                          // auth0 is not coming across.
+      //                          // maybe because auth0 is not so great?
+      //}
+
+      //CookieHandler cookieHandler = new CookieHandler();
+      //logger.info("JWT token is " + jSWebToken);
+
+      //cookieHandler.handleSuccessfulLogin(res, jSWebToken, groupsStr, expiresInStr);
     }
 }

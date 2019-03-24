@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
-import com.auth0.Tokens;
 
 public class CookieHandler {
     private static Logger logger = LoggerFactory.getLogger(CookieHandler.class);

@@ -1,7 +1,7 @@
 package martinbradley.auth0;
 
 
-import com.auth0.AuthenticationController;
+import com.auth0.client.auth.AuthAPI;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
-    private AuthenticationController authenticationController;
+    private AuthAPI authAPI;
     private String domain = "", callbackURL = "", audience = ""; 
     private static Logger logger = LoggerFactory.getLogger(AuthenticationControllerProvider.class);
 
@@ -34,8 +34,8 @@ public class LoginServlet extends HttpServlet {
         audience    = context.getInitParameter("AUTH0_AUDIENCE");
 
         try {
-            authenticationController = new AuthenticationControllerProvider(config)
-                                                            .getAuthController();
+            authAPI = new AuthenticationControllerProvider(config)
+                                                            .getAuthAPI();
         } catch (UnsupportedEncodingException e) {
             logger.warn("Cannot init LoginServlet '" + e.getMessage() + "'");
             throw new ServletException("Could not create the AuthenticationController instance.", e);
@@ -48,9 +48,11 @@ public class LoginServlet extends HttpServlet {
         logger.warn("LoginServlet audience '" + audience + "'");
         logger.warn("callbackURL '" + callbackURL + "'");
 
-        String authorizeUrl = authenticationController.buildAuthorizeUrl(req, callbackURL)
-                                                      .withAudience(audience)
-                                                      .build();
+        String authorizeUrl = authAPI.authorizeUrl(callbackURL)
+                                     .withAudience(audience)
+                                     .withResponseType("token")
+                                     .withScope("profile token openid")
+                                     .build();
         logger.warn("LoginServlet redirecting to " + authorizeUrl);
 
 

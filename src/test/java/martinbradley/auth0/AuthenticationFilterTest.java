@@ -20,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Response;
+import java.util.Map;
+import java.util.HashMap;
+import javax.ws.rs.core.Cookie;
 
 public class AuthenticationFilterTest {
     private static Logger logger = LoggerFactory.getLogger(AuthenticationFilterTest.class);
@@ -52,6 +55,17 @@ public class AuthenticationFilterTest {
             logger.debug("expectBearerToken 'Bearer ' "+ aToken);
         }};
     }
+    private void expectCookeJWT(final String aToken) {
+        new Expectations(){{
+            Map<String, Cookie> cookieMap = new HashMap<>();
+            Cookie jwtToken = new Cookie("jwtToken", aToken);
+            cookieMap.put("jwtToken", jwtToken);
+
+            requestContext.getCookies();
+            result = cookieMap;
+        }};
+    }
+
     private void expectedGroups(String ... groups) throws Exception {
         new Expectations(){{
             helper.getGroups((ResourceInfo)any);
@@ -67,10 +81,30 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void testSuccessful() 
+    public void testSuccessfulWithHeaderToken() 
         throws Exception {
 
         expectBearerToken("123");
+
+        expectedGroups("admins");
+
+        expectedAuth0Result(true);
+
+        timesAbortCalled(0);
+
+        new Expectations(){{
+            requestContext.abortWith( (Response)any);
+            times = 0;
+        }};
+
+        impl.filter(requestContext);
+    }
+
+    @Test
+    public void testSuccessfulWithCookie() 
+        throws Exception {
+
+        expectCookeJWT("123");
 
         expectedGroups("admins");
 
@@ -112,4 +146,14 @@ public class AuthenticationFilterTest {
 
         impl.filter(requestContext);
     }
+
+    @Test
+    public void testFailed_NoToken() 
+        throws Exception {
+
+        timesAbortCalled(1);
+
+        impl.filter(requestContext);
+    }
+
 }
