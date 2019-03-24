@@ -11,11 +11,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import javax.servlet.ServletContext;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Context;
 import com.auth0.jwk.JwkException;
 import javax.ws.rs.container.ResourceInfo;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 
 @SecuredRestfulMethod
 @Provider
@@ -45,20 +47,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext)
         throws IOException {
 
-        String authorizationHeader =
-                requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        String authToken = getAuthToken(requestContext);
 
-        if (!isTokenBasedAuthentication(authorizationHeader)) {
+        if (authToken.isEmpty()) {
             logger.warn("JWT token missing.");
             abortWithUnauthorized(requestContext);
             return;
         }
 
-        String token = authorizationHeader
-                            .substring(AUTHENTICATION_SCHEME.length())
-                            .trim();
         try {
-            if (validateToken(token) == false) {
+            if (validateToken(authToken) == false) {
                 abortWithUnauthorized(requestContext);
             }
 
@@ -68,6 +66,51 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         }
         logger.warn("Request AUTHORIZED");
     }
+
+    private String getAuthToken(ContainerRequestContext requestContext) {
+        String token = getCookieAuthToken(requestContext);
+
+        if (token.isEmpty()){
+            token = getHeaderAuthToken(requestContext);
+        }
+        return token;
+    }
+
+    private String getCookieAuthToken(ContainerRequestContext requestContext) {
+
+        Map<String, Cookie> cookies  = (Map<String, Cookie>)requestContext.getCookies();
+        for (String key : cookies.keySet()){
+            logger.debug("Got cookie named "+ key);
+        }
+        logger.debug("Cookie map has " + cookies.size() );
+
+        String token = "";
+
+        Cookie jwtCookie = cookies.get("jwtToken");
+
+        // If the cookie is
+        if (jwtCookie != null) {
+            token = jwtCookie.getValue();
+        }
+        return token;
+    }
+
+    private String getHeaderAuthToken(ContainerRequestContext requestContext) {
+        String authorizationHeader =
+                requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+
+
+        if (!isTokenBasedAuthentication(authorizationHeader)) {
+            logger.warn("JWT token not in header.");
+            return "";
+        }
+
+        String token = authorizationHeader
+                            .substring(AUTHENTICATION_SCHEME.length())
+                            .trim();
+        return token;
+    }
+
 
     private void abortWithUnauthorized(ContainerRequestContext requestContext) {
 

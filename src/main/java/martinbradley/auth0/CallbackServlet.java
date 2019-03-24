@@ -143,9 +143,9 @@ public class CallbackServlet extends HttpServlet {
         String expiresInStr = "-1";
         if (expiresIn != null) {
             expiresInStr = expiresIn.toString();
-            expiresInStr = "900";// 15 minutes.   Unsure why the value from  
-                                 // auth0 is not coming across.
-                                 // maybe because auth0 is not so great?
+            expiresInStr = "3600";// 900 = 15 minutes.   Unsure why the value from  
+                                  // auth0 is not coming across.
+                                  // maybe because auth0 is not so great?
         }
 
         CookieHandler cookieHandler = new CookieHandler();

@@ -43,7 +43,6 @@ import martinbradley.auth0.SecuredRestfulMethod;
 @Path("/hospital")
 public class HospitalResourceImpl 
 {
-    //private static final String ADMIN_ROLE="AdminUsers";
     @Inject PatientHandler patientHandler;
     @Inject MedicineHandler medicineHandler;
     private static Logger logger = LoggerFactory.getLogger(HospitalResourceImpl.class);

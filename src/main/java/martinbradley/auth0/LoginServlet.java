@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.auth0.client.mgmt.UsersEntity;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -50,6 +51,7 @@ public class LoginServlet extends HttpServlet {
 
         String authorizeUrl = authenticationController.buildAuthorizeUrl(req, callbackURL)
                                                       .withAudience(audience)
+                                                      .withScope("profile token openid")
                                                       .build();
         logger.warn("LoginServlet redirecting to " + authorizeUrl);
 

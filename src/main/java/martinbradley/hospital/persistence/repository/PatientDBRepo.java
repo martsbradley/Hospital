@@ -99,25 +99,8 @@ public class PatientDBRepo
         }
     }
 
-    private boolean duplicatePatientCheck(Patient aPatient)
-    {
-        TypedQuery<Patient> query = entityManager.createNamedQuery("Patient.withSameName",
-                                                                   Patient.class);
-        query.setParameter("forename",aPatient.getForename());
-        query.setParameter("surname", aPatient.getSurname());
 
-        List<Patient> sameNamedPatients= query.getResultList();
 
-        boolean duplicate = !sameNamedPatients.isEmpty() && 
-                            (sameNamedPatients.size() != 1 ||
-                             !sameNamedPatients.get(0).getId().equals(aPatient.getId()));
-
-      //logger.warn("Found a duplicate..?" + duplicate);
-      //logger.warn("Patient is " + aPatient);
-      //logger.warn("This list contains "+ sameNamedPatients);
-
-        return duplicate;
-    }
 
     private String getTransactionStatusString() throws Exception {
 
@@ -139,31 +122,43 @@ public class PatientDBRepo
     public SavePatientResponse savePatient(Patient aPatient)
     {
         aPatient.setSex(Sex.Male);
-        logger.info("\n\n\n\n\nSave patient :" + aPatient);
-        logger.info("Transacion is " + tx);
-        logger.info("entityManager is " + entityManager);
-        FlushModeType flushMode =  entityManager.getFlushMode();
-        logger.info("FlushModeType is " + flushMode);
+      //logger.info("\n\n\n\n\nSave patient :" + aPatient);
+      //logger.info("Transacion is " + tx);
+      //logger.info("entityManager is " + entityManager);
+        //FlushModeType flushMode =  entityManager.getFlushMode();
+        //logger.info("FlushModeType is " + flushMode);
 
+        SavePatientResponse resp = null;
+        MessageCollection msg = new MessageCollection();
         try{
-            logger.warn("Tx status is " + getTransactionStatusString());
+            //logger.warn("Tx status is " + getTransactionStatusString());
             tx.begin();
-            logger.warn("After begin Tx status is " + getTransactionStatusString());
+            //logger.warn("After begin Tx status is " + getTransactionStatusString());
 
-            if (duplicatePatientCheck(aPatient)) {
+            PatientRepoHelper helper = new PatientRepoHelper();
+
+            if (helper.duplicatePatientCheck(entityManager, aPatient)) {
                 logger.info("This patient already exists!");
-                MessageCollection msg = new MessageCollection();
                 msg.add(new Message(MessageKeyImpl.PATIENT_NAME_DUPLICATE));
 
-                SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
+                resp = new SavePatientResponse(aPatient, msg);
                 return resp;
             }
 
             logger.info("Patient not a duplicate");
 
             if (aPatient.getId() == null) {
-                logger.info("Calling persist");
-                entityManager.persist(aPatient);
+                int totalPatients = getTotalPatients();
+                logger.info("Got totalPatients " + totalPatients);
+
+                if (totalPatients < 50) {
+                    logger.info("Calling persist");
+
+                    entityManager.persist(aPatient);
+                }
+                else {
+                    throw new Exception("Already enough patients " + totalPatients);
+                }
             }
             else {
                 logger.info("Calling merge");
@@ -173,15 +168,15 @@ public class PatientDBRepo
             logger.info("save finished");
             entityManager.flush();
             tx.commit();
-            logger.warn("After commit tx status is " + getTransactionStatusString());
+            //logger.warn("After commit tx status is " + getTransactionStatusString());
+            resp = new SavePatientResponse(aPatient, msg);
         }
         catch (OptimisticLockException e) {
             logger.warn("OptimisticLockException " + e.getMessage());
 
-            MessageCollection msg = new MessageCollection();
             msg.add(new Message(MessageKeyImpl.OPTIMISTIC_LOCK_EXCEPTION));
 
-            SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
+            resp = new SavePatientResponse(aPatient, msg);
 
             rollbackTransaction();
             return resp;
@@ -191,14 +186,12 @@ public class PatientDBRepo
 
             rollbackTransaction();
 
-            MessageCollection msg = new MessageCollection();
             msg.add(new Message(MessageKeyImpl.OPTIMISTIC_LOCK_EXCEPTION));// fix me here!!!
 
-            SavePatientResponse resp = new SavePatientResponse(aPatient, msg);
+            resp = new SavePatientResponse(aPatient, msg);
         }
 
         logger.info("savePatient returning " + aPatient.getId());
-        SavePatientResponse resp = new SavePatientResponse(aPatient, new MessageCollection());
         return resp;
     }
 
@@ -237,14 +230,6 @@ public class PatientDBRepo
         return patients;
     }
 
-    public int getTotalPatients()
-    {
-        Query query = entityManager.createQuery("select COUNT(m) from Patient m");
-
-        Number result = (Number) query.getSingleResult();
-
-        return result.intValue();
-    }
 
     public Patient loadById(long id)
     {
@@ -270,5 +255,12 @@ public class PatientDBRepo
       //    logger.warn("loadById finally");
       //}
         return pat;
+    }
+
+    public int getTotalPatients() {
+        PatientRepoHelper helper = new PatientRepoHelper();
+
+        int totalPatients = helper.getTotalPatients(entityManager);
+        return totalPatients;
     }
 }
