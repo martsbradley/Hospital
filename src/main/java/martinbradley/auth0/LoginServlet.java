@@ -50,12 +50,11 @@ public class LoginServlet extends HttpServlet {
 
         String authorizeUrl = authAPI.authorizeUrl(callbackURL)
                                      .withAudience(audience)
-                                     .withResponseType("token")
+                                     .withResponseType("token")// Needed to get the token in the callback.
+                                     .withParameter("response_mode","form_post")// the call back is via POST rather than GET
                                      .withScope("profile token openid")
                                      .build();
         logger.warn("LoginServlet redirecting to " + authorizeUrl);
-
-
 
         res.sendRedirect(authorizeUrl);
     }

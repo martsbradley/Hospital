@@ -26,3 +26,19 @@ start_date TIMESTAMP NOT NULL,
 end_date TIMESTAMP NOT NULL,
 amount VARCHAR(40) NOT NULL
 );
+
+
+
+
+create table logindetails (
+id SERIAL PRIMARY KEY,
+name varchar(255),
+given_name varchar(255),
+family_name varchar(255),
+nickname varchar(50),
+gender varchar(10),
+locale varchar(10),
+updated_at varchar(50),
+picture varchar(250),
+groups varchar(250)
+);
