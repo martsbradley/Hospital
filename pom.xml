@@ -259,8 +259,8 @@
         </dependency>
         <dependency>
             <groupId>com.auth0</groupId>
-            <artifactId>mvc-auth-commons</artifactId>
-            <version>1.0.3</version>
+            <artifactId>auth0</artifactId>
+            <version>1.11.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

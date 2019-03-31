@@ -33,7 +33,7 @@
     </context-param>
     <context-param>
         <param-name>AUTH0_CALLBACK_URL</param-name>
-        <param-value>https://localhost:3000/firstcup/auth0callback</param-value>
+        <param-value>https://localhost:8443/firstcup/auth0callback</param-value>
     </context-param>
     <context-param>
         <param-name>AUTH0_AUDIENCE</param-name>
@@ -46,19 +46,12 @@
 
     <context-param>
         <param-name>AUTH0_LOGIN_SUCCESS</param-name>
-        <param-value>https://localhost:3000/loginsuccess</param-value>
+        <param-value>https://localhost:8443/loginsuccess</param-value>
     </context-param>
     <context-param>
         <param-name>AUTH0_LOGIN_FAILURE</param-name>
-        <param-value>https://localhost:3000/loginfailure</param-value>
+        <param-value>https://localhost:8443/loginfailure</param-value>
     </context-param>
-
-    <!--             
-
-
-"https://gorticrum.com/user_authorization",
-
-    -->
 
     <!-- ********** Below three are for the jwt cookie in http only -->
     <context-param>
@@ -67,11 +60,11 @@
     </context-param>
     <context-param>
         <param-name>com.auth0.clientId</param-name>
-        <param-value>OnNhVbmK534QxJuvHyF3toSKkGdHNUAC</param-value>
+        <param-value>flY5Acszv9EiNaJ9D6M0xcs0DWtHPBF0</param-value>
     </context-param>
     <context-param>
         <param-name>com.auth0.clientSecret</param-name>
-        <param-value>n04AZeX__gKNZhhvGMIXYCtknvNPAL4DluBMup3un3Id3HNHoVYRVGUkWfIemnNE</param-value>
+        <param-value>0gMvQhmoR7K6kcubrrHJQaGM5rjvzgOHvQ0qgjk3R0LnDtXf_VP8ZoGMsRwuhWhz</param-value>
     </context-param>
 
 
@@ -99,4 +92,18 @@
         <welcome-file>greeting.xhtml</welcome-file>
     </welcome-file-list>
     -->
+
+    <!-- this says I want secure communications over TLS -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>myresources</web-resource-name>
+            <url-pattern>/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+
+        <user-data-constraint>
+             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
 </web-app>

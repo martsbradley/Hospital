@@ -1,11 +1,9 @@
 package martinbradley.auth0;
 
-import com.auth0.AuthenticationController;
-import com.auth0.IdentityVerificationException;
+import com.auth0.client.auth.AuthAPI;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
-import com.auth0.Tokens;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -18,7 +16,9 @@ import java.io.UnsupportedEncodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
+import java.util.Enumeration;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 /**
  * The Servlet endpoint used as the callback handler in the OAuth 2.0 authorization code grant flow.
@@ -27,17 +27,21 @@ import java.util.stream.Collectors;
 @WebServlet(urlPatterns = {"/auth0callback"})
 public class CallbackServlet extends HttpServlet {
 
-    private String redirectOnSuccess = "";// "https://localhost:3000/";
-    private String redirectOnFail    = "";// "https://localhost:3000/loginfailure";
+    private String redirectOnSuccess = "";
+    private String redirectOnFail    = "";
     private String auth0URL          = "";
     private String auth0Issuer       = "";
-    private String auth0Namespace    = "";//"https://gorticrum.com/user_authorization"
+    private String auth0Namespace    = "";
     public static final String AUTH0_URL    = "AUTH0_URL";
     public static final String AUTH0_ISSUER = "AUTH0_ISSUER";
     public static final String AUTH0_NAMESPACE = "AUTH0_NAMESPACE";
+    private Auth0RSASolution auth0RSA;
+
+    @Inject
+    private UserProfileQuery userProfileQuery;
 
 
-    private AuthenticationController authenticationController;
+    private AuthAPI authAPI;
     private static Logger logger = LoggerFactory.getLogger(CallbackServlet.class);
     private Auth0Verifier verifier;
 
@@ -68,8 +72,8 @@ public class CallbackServlet extends HttpServlet {
         auth0URL          = context.getInitParameter(AUTH0_URL);
         
         try {
-            authenticationController = new AuthenticationControllerProvider(config)
-                                                            .getAuthController();
+            authAPI = new AuthenticationControllerProvider(config)
+                                                            .getAuthAPI();
 
             Auth0KeyProvider provider = new Auth0KeyProvider(auth0URL);
             
@@ -96,6 +100,12 @@ public class CallbackServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+        logger.warn("doPost Called");
+        handle(req, res);
+    }
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+        logger.warn("doGet Called");
         handle(req, res);
     }
 
@@ -104,8 +114,6 @@ public class CallbackServlet extends HttpServlet {
 
         try {
             handleCookies(req, res);
-
-            logger.debug("Success Redirecting to " + redirectOnSuccess);
 
             HttpSession session = req.getSession(false);
 
@@ -116,7 +124,7 @@ public class CallbackServlet extends HttpServlet {
                 // session will not record client state since 
                 // the jwt is passed in each request.
             }
-
+            logger.debug("Success Redirecting to " + redirectOnSuccess);
             res.sendRedirect(redirectOnSuccess);
 
         } catch (Exception e) {
@@ -132,25 +140,22 @@ public class CallbackServlet extends HttpServlet {
     private void handleCookies(HttpServletRequest req, HttpServletResponse res) 
         throws Exception {
 
-        Tokens tokens = authenticationController.handle(req);
-
-        String jSWebToken = tokens.getAccessToken();
+        String jSWebToken = req.getParameter("access_token");
+        // An exception is thrown if the token not valid.
         Set<String> groups = verifier.readGroups(jSWebToken, auth0Namespace);
+        for (String group: groups) {
+            logger.warn("Got group: " + group);
+        }
 
         String groupsStr = groups.stream().collect(Collectors.joining(","));
-
-        Long expiresIn = tokens.getExpiresIn();
-        String expiresInStr = "-1";
-        if (expiresIn != null) {
-            expiresInStr = expiresIn.toString();
-            expiresInStr = "3600";// 900 = 15 minutes.   Unsure why the value from  
-                                  // auth0 is not coming across.
-                                  // maybe because auth0 is not so great?
-        }
+        
+        String expiresInStr = req.getParameter("expires_in");
 
         CookieHandler cookieHandler = new CookieHandler();
         logger.info("JWT token is " + jSWebToken);
 
         cookieHandler.handleSuccessfulLogin(res, jSWebToken, groupsStr, expiresInStr);
+
+        userProfileQuery.handleGettingProfile(authAPI, jSWebToken, groupsStr);
     }
 }
