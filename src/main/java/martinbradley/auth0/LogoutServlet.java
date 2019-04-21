@@ -15,6 +15,7 @@ public class LogoutServlet extends HttpServlet {
 
     private String domain   = "";
     private String clientId = "";
+    private String returnToUrl = "";
     private static Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
 
     @Override
@@ -22,6 +23,7 @@ public class LogoutServlet extends HttpServlet {
         super.init(config);
         domain = config.getServletContext().getInitParameter("com.auth0.domain");
         clientId = config.getServletContext().getInitParameter("com.auth0.clientId");
+        returnToUrl = config.getServletContext().getInitParameter("AUTH0_LOGOUT_SUCCESS");
     }
 
     @Override
@@ -32,9 +34,9 @@ public class LogoutServlet extends HttpServlet {
             logger.warn("LogoutServlet invalidate called");
         }
 
-        String returnTo = "https://localhost:3000/logoutsuccess";
+        //String returnTo = "https://localhost:3000/logoutsuccess";
 
-        String logoutUrl = String.format("https://%s/v2/logout?client_id=%s&returnTo=%s", domain, clientId, returnTo);
+        String logoutUrl = String.format("https://%s/v2/logout?client_id=%s&returnTo=%s", domain, clientId, returnToUrl);
 
         logger.warn("LogoutServlet redirect to '" + logoutUrl + "'");
 

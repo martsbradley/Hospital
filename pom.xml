@@ -24,6 +24,63 @@
         <junit.platform.version>1.1.0</junit.platform.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${maven-war-plugin.verison}</version>
+                        <configuration>
+                            <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
+                            <webXml>src/main/webapp/WEB-INF/dev/web.xml</webXml>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>default-war</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>war-exploded</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exploded</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${maven-war-plugin.verison}</version>
+                        <configuration>
+                            <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
+                            <webXml>src/main/webapp/WEB-INF/prod/web.xml</webXml>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>war-exploded</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exploded</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>${project.artifactId}</finalName>
         <defaultGoal>package</defaultGoal>
@@ -54,27 +111,6 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>${maven-war-plugin.verison}</version>
-                <configuration>
-                    <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-war</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>war-exploded</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exploded</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
