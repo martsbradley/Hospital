@@ -33,21 +33,21 @@ public class CallbackServletTest {
 
     @BeforeEach
     public void beforeEach() {
-        setupWebxml();
+        //setupWebxml();
     }
 
     CallbackServlet servlet = new CallbackServlet();
 
-    private void setupWebxml() {
-        new Expectations(){{
-            config.getServletContext(); result = context;
-            context.getInitParameter("AUTH0_LOGIN_SUCCESS"); result = successURL;
-            context.getInitParameter("AUTH0_LOGIN_FAILURE"); result = failureURL;
+/// private void setupWebxml() {
+///     new Expectations(){{
+///         config.getServletContext(); result = context;
+///         context.getInitParameter("AUTH0_LOGIN_SUCCESS"); result = successURL;
+///         context.getInitParameter("AUTH0_LOGIN_FAILURE"); result = failureURL;
 
-            context.getInitParameter(CallbackServlet.AUTH0_URL);    result = "https://localhosthttpstennant.eu.auth0.com";
-            context.getInitParameter(CallbackServlet.AUTH0_ISSUER); result = "https://localhosthttpstennant.eu.auth0.com/";
-        }};
-    }
+///         context.getInitParameter(CallbackServlet.AUTH0_URL);    result = "https://localhosthttpstennant.eu.auth0.com";
+///         context.getInitParameter(CallbackServlet.AUTH0_ISSUER); result = "https://localhosthttpstennant.eu.auth0.com/";
+///     }};
+/// }
 
   //@Test
   //public void handlePostSuccess() throws Exception {

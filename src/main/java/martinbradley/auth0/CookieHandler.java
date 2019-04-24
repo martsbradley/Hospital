@@ -31,22 +31,28 @@ public class CookieHandler {
                                       String jSWebToken,
                                       String groupsStr,
                                       String expiresInStr) throws Exception {
+        final boolean useHttps = false;
 
         Cookie groupsCookie = new Cookie(AUTH0_GROUPS, groupsStr);
-        groupsCookie.setSecure(true);
+        groupsCookie.setSecure(useHttps);
         groupsCookie.setPath("/");
 
         Cookie jwtCookie = new Cookie(AUTH0_JWT_TOKEN, jSWebToken);
-        jwtCookie.setSecure(true);
-        jwtCookie.setHttpOnly(true);// Do not allow Javascript to see this value.
+        groupsCookie.setSecure(useHttps);
+        //
+        //  UNCOMMENT THIS FIXME disabled for non http testing.
+        //
+        //jwtCookie.setHttpOnly(true);// Do not allow Javascript to see this value.
+        //
+        //
         jwtCookie.setPath("/");
 
         Cookie jwtExpiresIn = new Cookie(AUTH0_EXPIRES_IN, expiresInStr);
-        jwtExpiresIn.setSecure(true);
+        groupsCookie.setSecure(useHttps);
         jwtExpiresIn.setPath("/");
 
         Cookie userStatus = new Cookie(AUTH0_LOGGED_IN, "loggedIn");
-        userStatus.setSecure(true);
+        groupsCookie.setSecure(useHttps);
         userStatus.setPath("/");
 
         res.addCookie(groupsCookie);
@@ -68,7 +74,9 @@ public class CookieHandler {
         for (String cookieName : cookieNames){
             Cookie cookie = new Cookie(cookieName, null); // Not necessary, but saves bandwidth.
             cookie.setPath("/");
+
             cookie.setHttpOnly(true);
+
             cookie.setMaxAge(0); // Don't set to -1 or it will become a session cookie!
             response.addCookie(cookie);
             logger.debug("Clearing " + cookieName);

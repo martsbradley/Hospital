@@ -28,17 +28,10 @@ public class LoginServlet extends HttpServlet {
         super.init(config);
 
         logger.warn("LoginServlet init called");
-        ServletContext context = config.getServletContext();
 
-        String marty = System.getenv().get("marty");
-        logger.warn("FOUND ENV VARIABLE MARTY" + marty);
-
-        logger.warn("FOUND PROP VARIABLE " + System.getProperty("marty"));
-
-
-        domain      = context.getInitParameter("com.auth0.domain");
-        callbackURL = context.getInitParameter("AUTH0_CALLBACK_URL");
-        audience    = context.getInitParameter("AUTH0_AUDIENCE");
+        domain      = Auth0Constants.AUTH0_DOMAIN.getValue();
+        callbackURL = Auth0Constants.AUTH0_CALLBACK_URL.getValue();
+        audience    = Auth0Constants.AUTH0_AUDIENCE.getValue();
 
         try {
             authAPI = new AuthenticationControllerProvider(config)

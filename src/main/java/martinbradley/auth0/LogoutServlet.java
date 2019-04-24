@@ -21,9 +21,10 @@ public class LogoutServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        domain = config.getServletContext().getInitParameter("com.auth0.domain");
-        clientId = config.getServletContext().getInitParameter("com.auth0.clientId");
-        returnToUrl = config.getServletContext().getInitParameter("AUTH0_LOGOUT_SUCCESS");
+        
+        domain      = Auth0Constants.AUTH0_DOMAIN.getValue();
+        clientId    = Auth0Constants.AUTH0_CLIENTID.getValue();
+        returnToUrl = Auth0Constants.AUTH0_LOGOUT_SUCCESS.getValue();
     }
 
     @Override

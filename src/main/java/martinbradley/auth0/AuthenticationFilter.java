@@ -34,10 +34,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private String auth0Issuer;
 
     @Context
-    public void setServletContext(ServletContext aContext) 
-        throws JwkException {
-        String auth0URL    = aContext.getInitParameter(AUTH0_URL);
-        auth0Issuer = aContext.getInitParameter(AUTH0_ISSUER);
+    public void setServletContext(ServletContext aContext) throws JwkException {
+
+        String auth0URL = Auth0Constants.AUTH0_URL.getValue();
+        auth0Issuer     = Auth0Constants.AUTH0_ISSUER.getValue();
         logger.warn("auth0URL    : " + auth0URL);
         logger.warn("auth0Issuer : " + auth0Issuer);
         auth0RSA = new Auth0RSASolution(auth0URL, auth0Issuer);

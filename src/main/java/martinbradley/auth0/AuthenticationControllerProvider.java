@@ -17,9 +17,9 @@ public class AuthenticationControllerProvider {
 
         ServletContext servletContext = config.getServletContext();
 
-        domain       = servletContext.getInitParameter("com.auth0.domain");
-        clientId     = servletContext.getInitParameter("com.auth0.clientId");
-        clientSecret = servletContext.getInitParameter("com.auth0.clientSecret");
+        domain       = Auth0Constants.AUTH0_DOMAIN.getValue();
+        clientId     = Auth0Constants.AUTH0_CLIENTID.getValue();
+        clientSecret = Auth0Constants.AUTH0_CLIENTSECRET.getValue();
     }
 
     public AuthAPI getAuthAPI() throws UnsupportedEncodingException {

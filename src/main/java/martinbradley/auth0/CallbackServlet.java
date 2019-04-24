@@ -32,9 +32,6 @@ public class CallbackServlet extends HttpServlet {
     private String auth0URL          = "";
     private String auth0Issuer       = "";
     private String auth0Namespace    = "";
-    public static final String AUTH0_URL    = "AUTH0_URL";
-    public static final String AUTH0_ISSUER = "AUTH0_ISSUER";
-    public static final String AUTH0_NAMESPACE = "AUTH0_NAMESPACE";
     private Auth0RSASolution auth0RSA;
 
     @Inject
@@ -65,15 +62,14 @@ public class CallbackServlet extends HttpServlet {
         super.init(config);
 
         final ServletContext context  = config.getServletContext(); 
-        redirectOnSuccess = context.getInitParameter("AUTH0_LOGIN_SUCCESS");
-        redirectOnFail    = context.getInitParameter("AUTH0_LOGIN_FAILURE");
-        auth0Namespace    = context.getInitParameter("AUTH0_NAMESPACE");
-        auth0Issuer       = context.getInitParameter(AUTH0_ISSUER);
-        auth0URL          = context.getInitParameter(AUTH0_URL);
+        redirectOnSuccess =Auth0Constants.AUTH0_LOGIN_SUCCESS.getValue();
+        redirectOnFail    =Auth0Constants.AUTH0_LOGIN_FAILURE.getValue();
+        auth0Namespace    =Auth0Constants.AUTH0_NAMESPACE.getValue();
+        auth0Issuer       =Auth0Constants.AUTH0_ISSUER.getValue();
+        auth0URL          =Auth0Constants.AUTH0_URL.getValue();
         
         try {
-            authAPI = new AuthenticationControllerProvider(config)
-                                                            .getAuthAPI();
+            authAPI = new AuthenticationControllerProvider(config).getAuthAPI();
 
             Auth0KeyProvider provider = new Auth0KeyProvider(auth0URL);
             
