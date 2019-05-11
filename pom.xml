@@ -5,7 +5,7 @@
     <groupId>org.glassfish.docs</groupId>
     <version>8.1-SNAPSHOT</version>
 
-    <artifactId>firstcup-war</artifactId>
+    <artifactId>hospital-war</artifactId>
     <packaging>war</packaging>
     <name>${project.artifactId}</name>
     <description>The web front-end for the First Cup Tutorial example.</description>
@@ -24,67 +24,33 @@
         <junit.platform.version>1.1.0</junit.platform.version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>${maven-war-plugin.verison}</version>
-                        <configuration>
-                            <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
-                            <webXml>src/main/webapp/WEB-INF/dev/web.xml</webXml>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>default-war</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>war-exploded</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exploded</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>${maven-war-plugin.verison}</version>
-                        <configuration>
-                            <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war</webappDirectory>
-                            <webXml>src/main/webapp/WEB-INF/prod/web.xml</webXml>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>war-exploded</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exploded</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <build>
         <finalName>${project.artifactId}</finalName>
         <defaultGoal>package</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.verison}</version>
+                <configuration>
+                    <webappDirectory>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/hospital.war</webappDirectory>
+                    <!-- <webXml>src/main/webapp/WEB-INF/dev/web.xml</webXml> -->
+                </configuration>
+                <executions>
+                    <!--
+                    <execution>
+                        <id>default-war</id>
+                        <phase>none</phase>
+                    </execution> -->
+                    <execution>
+                        <id>war-exploded</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exploded</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -142,7 +108,7 @@
                     <executable>/usr/bin/touch</executable>
                     <workingDirectory>.</workingDirectory>
                     <arguments>
-                        <argument>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/firstcup.war.dodeploy</argument>
+                        <argument>/home/martin/Software/Java/wildfly/wildfly-13.0.0.Final/standalone/deployments/hospital.war.dodeploy</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -156,6 +122,34 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                  <execution>
+                    <id>copy-file</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                      <goal>copy</goal>
+                    </goals>
+                    <configuration>
+                      <sourceFile>src/someDirectory/test.environment.properties</sourceFile>
+                      <destinationFile>target/someDir/environment.properties</destinationFile>
+                        <fileSets>
+                            <fileSet>
+                            <sourceFile>/home/martin/Software/JavaScript/HospitalReact/dist/bundle.js</sourceFile>
+                            <destinationFile>src/main/webapp/bundle.js</destinationFile>
+                            </fileSet>
+                            <fileSet>
+                            <sourceFile>/home/martin/Software/JavaScript/HospitalReact/src/index.html</sourceFile>
+                            <destinationFile>src/main/webapp/index.html</destinationFile>
+                            </fileSet>
+                        </fileSets>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
         </plugins>
     </build>
 

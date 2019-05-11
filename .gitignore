@@ -2,3 +2,4 @@ target/
 *.swp
 derby.log
 env
+myDerbyDB

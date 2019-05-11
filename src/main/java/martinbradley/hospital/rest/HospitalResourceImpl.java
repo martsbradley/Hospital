@@ -38,6 +38,7 @@ import javax.ws.rs.core.Context;
 import javax.servlet.http.HttpServletRequest;
 
 import martinbradley.hospital.core.api.dto.MessageCollection;
+import martinbradley.hospital.core.api.dto.Message;
 import martinbradley.auth0.SecuredRestfulMethod;
 
 @Path("/hospital")
@@ -111,10 +112,12 @@ public class HospitalResourceImpl
         
         if (id == null || messages.hasMessages())
         {
+            ValidationErrors errors = asValidationErrors(messages);
+
             logger.info("Failed to save" + messages);
             return Response.status(Status.BAD_REQUEST)
                            .type(MediaType.APPLICATION_JSON)
-                           .entity(messages.toString())
+                           .entity(errors)
                            .build();
         }
 
@@ -229,6 +232,19 @@ public class HospitalResourceImpl
 	    errors.add(error);
 	}
 	return errors;
+    }
+
+    private ValidationErrors asValidationErrors(MessageCollection aMessages){
+
+	ValidationErrors errors = new ValidationErrors();
+
+        for (Message message: aMessages) {
+	    ValidationError error = new ValidationError();
+	    error.setField(message.getKey());
+	    error.setMessage(message.toString());
+	    errors.add(error);
+        }
+        return errors;
     }
 
 
