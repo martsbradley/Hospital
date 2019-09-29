@@ -3,10 +3,10 @@ import javax.inject.Named;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.ArrayList;
-import martinbradley.hospital.persistence.repository.PatientDBRepo;
 import martinbradley.hospital.web.beans.PatientBean;
 import javax.enterprise.inject.Model;
 import martinbradley.hospital.web.beans.PatientBeanMapper;
+import martinbradley.hospital.web.beans.UploadBeanMapper;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +17,15 @@ import martinbradley.hospital.core.api.dto.*;
 import javax.validation.ConstraintViolation;
 import java.util.Set;
 import martinbradley.hospital.web.beans.PageInfo;
+import martinbradley.hospital.rest.ImageUploaded;
+import java.time.LocalDateTime;
 
 @ApplicationScoped
 @Named
 public class PatientHandler
 {
     private static final Logger logger = LoggerFactory.getLogger(PatientHandler.class);
-    final PatientBeanMapper mapper = Mappers.getMapper(PatientBeanMapper.class);
+    final PatientBeanMapper patientMapper = Mappers.getMapper(PatientBeanMapper.class);
 
     @Inject PatientBroker patientBroker;
 
@@ -34,7 +36,7 @@ public class PatientHandler
         ArrayList<PatientBean> beans = new ArrayList<>();
         for (PatientDTO p: patients)
         {
-            PatientBean bean = mapper.dtoToBean(p);
+            PatientBean bean = patientMapper.dtoToBean(p);
             beans.add(bean);
         }
         return beans;
@@ -47,7 +49,7 @@ public class PatientHandler
     public long savePatient(PatientBean patientBean, MessageCollection aMessages)
     {
         logger.info("Save Patient: " + patientBean);
-        PatientDTO patient = mapper.beanToDTO(patientBean);
+        PatientDTO patient = patientMapper.beanToDTO(patientBean);
 
         long patientId = patientBroker.savePatient(patient, aMessages);
 
@@ -75,7 +77,7 @@ public class PatientHandler
     public void deletePatient(PatientBean patientBean)
     {
         logger.info("Delete Patient: " + patientBean);
-        PatientDTO patient = mapper.beanToDTO(patientBean);
+        PatientDTO patient = patientMapper.beanToDTO(patientBean);
         patientBroker.deletePatient(patient);
     }
 
@@ -83,7 +85,25 @@ public class PatientHandler
     {
         PatientDTO patientDTO = patientBroker.loadById(id);
         logger.info(String.format("loadById(%d) returned %s",id, patientDTO));
-        PatientBean bean = mapper.dtoToBean(patientDTO);
+        PatientBean bean = patientMapper.dtoToBean(patientDTO);
         return bean;
     }
+
+    public void saveImage(long patientId, ImageUploaded upload) {
+
+        logger.info("saveImage");
+        final UploadBeanMapper uploadMapper = Mappers.getMapper(UploadBeanMapper.class);
+        UploadedImageDTO dto = uploadMapper.beanToDTO(upload);
+
+        dto.setPatientId(patientId);
+        dto.setName("Martyname");
+        dto.setBucket("Martybuck");
+        dto.setDateUploaded(LocalDateTime.now());
+
+
+        logger.info("saveImage calling broker.");
+        patientBroker.saveImage(dto);
+        logger.info("saveImage finished.");
+    }
+
 }

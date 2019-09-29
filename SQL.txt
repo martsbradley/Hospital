@@ -1,6 +1,7 @@
 drop table prescription;
 drop table patient;
 drop table medicine;
+drop table uploadedimage;
 
 create table patient (
 id SERIAL PRIMARY KEY,
@@ -41,4 +42,13 @@ locale varchar(10),
 updated_at varchar(50),
 picture varchar(250),
 groups varchar(250)
+);
+
+create table uploadedimage (
+id SERIAL PRIMARY KEY,
+patient_id INTEGER NOT NULL REFERENCES patient (id),
+name   VARCHAR(250) NOT NULL,
+bucket VARCHAR(40) NOT NULL,
+description VARCHAR(250),
+date_uploaded TIMESTAMP NOT NULL
 );

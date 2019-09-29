@@ -2,6 +2,7 @@ package martinbradley.hospital.core.api;
 
 import java.util.List;
 import martinbradley.hospital.core.api.dto.PatientDTO;
+import martinbradley.hospital.core.api.dto.UploadedImageDTO;
 import martinbradley.hospital.core.api.dto.MessageCollection;
 import martinbradley.hospital.web.beans.PageInfo;
 
@@ -16,4 +17,8 @@ public interface PatientBroker
     public PatientDTO deletePatient(PatientDTO aPatient);
 
     public PatientDTO loadById(long id);
+
+    public List<String> listImages(long patientId);
+
+    public UploadedImageDTO saveImage(UploadedImageDTO imageDTO);
 }

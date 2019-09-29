@@ -17,6 +17,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import martinbradley.hospital.core.api.dto.MessageCollection;
 import martinbradley.hospital.core.api.dto.Message;
 import martinbradley.auth0.SecuredRestfulMethod;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 @Path("/hospital")
 public class HospitalResourceImpl 
@@ -208,6 +211,29 @@ public class HospitalResourceImpl
                        .build();
     }
 
+    @POST
+    @Path("patient/{patientId}/image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    @SecuredRestfulMethod(groups={"adminGroup"})
+    @ContentLengthMethod
+    public Response addImage(@PathParam("patientId") long patientId,
+                             @MultipartForm ImageUploaded myForm)
+    {
+        logger.debug("ImageUploaded called " + myForm);
+
+        int total = 10;
+
+        patientHandler.saveImage(patientId, myForm);
+
+
+
+        return Response.accepted(total)
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
+
     private ValidationErrors validate(PatientBean patientBean) {
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -246,6 +272,7 @@ public class HospitalResourceImpl
         }
         return errors;
     }
+
 
 
   //@GET

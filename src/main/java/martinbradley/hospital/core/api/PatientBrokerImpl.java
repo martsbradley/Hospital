@@ -14,6 +14,7 @@ import javax.validation.ValidatorFactory;
 import martinbradley.hospital.core.api.dto.PatientDTO;
 import martinbradley.hospital.core.domain.*;
 import martinbradley.hospital.persistence.repository.PatientDBRepo;
+import martinbradley.hospital.persistence.repository.UploadedImageRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collections;
@@ -21,11 +22,15 @@ import martinbradley.hospital.core.api.dto.*;
 import org.mapstruct.factory.Mappers;
 import martinbradley.hospital.core.domain.SavePatientResponse;
 import martinbradley.hospital.web.beans.PageInfo;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Model
 public class PatientBrokerImpl implements PatientBroker
 {
     @Inject PatientDBRepo repo;
+    @Inject UploadedImageRepo imageRepo;
+
     private static final Logger logger = LoggerFactory.getLogger(PatientBrokerImpl.class);
 
     @Override
@@ -34,7 +39,6 @@ public class PatientBrokerImpl implements PatientBroker
         Patient.SortOrder ordering = Patient.SortOrder.find(aPageInfo.getSortField(), 
                                                             aPageInfo.isAscending());
   
-       
         List<Patient> patients = repo.pagePatients(aPageInfo.getStartingAt(), 
                                                    aPageInfo.getMaxPerPage(), 
                                                    ordering);
@@ -120,6 +124,7 @@ public class PatientBrokerImpl implements PatientBroker
         return !violations.isEmpty();
     }
 
+    @Override
     public PatientDTO deletePatient(PatientDTO aPatientDTO)
     {
         logger.debug("deletePatient" + aPatientDTO);
@@ -127,7 +132,7 @@ public class PatientBrokerImpl implements PatientBroker
 
         Patient pat = mapper.dtoToPatient(aPatientDTO);
         repo.deletePatient(pat);
-        //TODO result should come from resp
+        //TODO result should come from repo?
         return aPatientDTO;
     }
 
@@ -150,5 +155,33 @@ public class PatientBrokerImpl implements PatientBroker
             logger.debug("---> A prescription" + p);
         }
         return dto;
+    }
+
+    public List<String> listImages(long patientId) {
+
+        List<UploadedImage> images = imageRepo.getImages(patientId);
+        List<String> urls = images.stream() 
+                                  .map(UploadedImage::getName)
+                                  .collect(Collectors.toList());
+        return urls;
+    }
+    public UploadedImageDTO saveImage(UploadedImageDTO imageDTO) {
+        logger.warn("Trying the image mapping");
+
+        Patient loadedPatient = repo.loadById(imageDTO.getPatientId());
+
+        final UploadedImageDTOMapper mapper = Mappers.getMapper(UploadedImageDTOMapper.class);
+        UploadedImage image = mapper.dtoToUploadedImage(imageDTO);
+        image.setPatient(loadedPatient);// TODO was unable to get MapStruct to set the patient.
+                                        //     MapStruct is able to perform this task.  
+
+        logger.warn("loadedPatient " + loadedPatient );
+        logger.warn("imageDTO length: " + imageDTO.getData().length );
+        imageRepo.saveUpload(image);
+
+        logger.warn("Created... "+ image);
+        logger.warn("Created with ... "+ image.getPatient());
+
+        return imageDTO;
     }
 }
